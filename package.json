@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "description": "Tieliikenne video wall using Finnish Digitraffic traffic cameras (Vite + React + Tailwind)",
-  "homepage": "./",
+  "homepage": "https://krugou.github.io/tieliikennevideowall/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node ./scripts/copyIndexTo404.js",
     "preview": "vite preview --port 4173",
     "type-check": "tsc --noEmit",
     "lint": "eslint './src/**/*.{ts,tsx,js,jsx}' --fix",

@@ -58,3 +58,11 @@ License
 Useful links
 - Digitraffic Weathercam API: https://www.digitraffic.fi/en/developers/
 
+Live demo
+- https://krugou.github.io/tieliikennevideowall/
+
+GitHub Pages notes
+- The Vite base is set to `/tieliikennevideowall/` for production builds to work on GitHub Pages.
+- A `postbuild` step copies `dist/index.html` to `dist/404.html` to enable SPA-style routing fallback.
+- GitHub Actions workflow is configured to build and deploy `dist/` to GitHub Pages automatically on push to `main`.
+
