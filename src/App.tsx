@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import CameraTile from './components/CameraTile';
 import CitySelector from './components/CitySelector';
+import Modal from './components/Modal';
 import { fetchStations, defaultCities, CameraFeature, ApiError } from './lib/api';
 
 type StationItem = {
@@ -31,6 +32,8 @@ const App: React.FC = () => {
   // new: state for forced 30 minute refresh
   const [refreshTick, setRefreshTick] = useState(0);
   const [nextForceRefreshAt, setNextForceRefreshAt] = useState<number | null>(null);
+
+  const [selectedItem, setSelectedItem] = useState<StationItem | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const rateLimitAttemptsRef = useRef(0);
@@ -143,15 +146,8 @@ const App: React.FC = () => {
     load({ force: true });
   };
 
-  const gridCols = useMemo(() => {
-    // Simple heuristic: more items -> more columns
-    const count = items.length;
-    if (count >= 24) return 'grid-cols-6';
-    if (count >= 16) return 'grid-cols-5';
-    if (count >= 12) return 'grid-cols-4';
-    if (count >= 8) return 'grid-cols-3';
-    return 'grid-cols-2';
-  }, [items.length]);
+  // row heights for mobile -> desktop
+  const autoRows = 'auto-rows-[140px] sm:auto-rows-[180px] md:auto-rows-[220px] lg:auto-rows-[260px]';
 
   // time display for header
   const [now, setNow] = useState(Date.now());
@@ -172,13 +168,38 @@ const App: React.FC = () => {
 
   const nextRefreshRemaining = nextForceRefreshAt ? Math.max(0, nextForceRefreshAt - now) : null;
 
+  const openModal = (item: StationItem) => {
+    setSelectedItem(item);
+  };
+
+  const closeModal = () => {
+    setSelectedItem(null);
+  };
+
+  // close modal with Escape and prevent background scroll
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    if (selectedItem) {
+      document.addEventListener('keydown', onKey);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [selectedItem]);
+
   return (
     <div className="h-full w-full flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white">
-      <header className="p-3 bg-transparent flex items-center gap-3">
-        <div className="flex items-center gap-3">
+      <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
           <h1 className="text-lg font-semibold">Tieliikenne Video Wall</h1>
-          <div className="text-xs opacity-80">{new Date(now).toLocaleString()}</div>
-          <div className="ml-2 text-xs bg-white/5 px-2 py-1 rounded">{cameraCount} cameras</div>
+          <div className="text-xs opacity-80 md:ml-2">{new Date(now).toLocaleString()}</div>
+          <div className="ml-0 sm:ml-2 text-xs bg-white/5 px-2 py-1 rounded">{cameraCount} cameras</div>
           {nextRefreshRemaining !== null && (
             <div className="ml-2 text-xs bg-blue-600/10 px-2 py-1 rounded text-blue-200">
               Next reload: {formatMs(nextRefreshRemaining)}
@@ -186,26 +207,31 @@ const App: React.FC = () => {
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <CitySelector selectedCities={selectedCities} onChange={(c) => setSelectedCities(c)} />
-          <label className="inline-flex items-center gap-2 ml-2 text-xs">
-            <input
-              type="checkbox"
-              checked={showLabels}
-              onChange={(e) => setShowLabels(e.target.checked)}
-            />
-            Show labels
-          </label>
+        <div className="w-full sm:w-auto flex items-center gap-2 justify-between">
+          <div className="flex-1 sm:flex-none">
+            <CitySelector selectedCities={selectedCities} onChange={(c) => setSelectedCities(c)} />
+          </div>
 
-          <button
-            title="Refresh now"
-            aria-label="Refresh now"
-            className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
-            onClick={manualRefresh}
-            disabled={loading}
-          >
-            Refresh
-          </button>
+          <div className="flex items-center gap-2 ml-auto">
+            <label className="inline-flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={showLabels}
+                onChange={(e) => setShowLabels(e.target.checked)}
+              />
+              <span className="hidden sm:inline">Show labels</span>
+            </label>
+
+            <button
+              title="Refresh now"
+              aria-label="Refresh now"
+              className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
+              onClick={manualRefresh}
+              disabled={loading}
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       </header>
 
@@ -229,24 +255,59 @@ const App: React.FC = () => {
       )}
 
       <main className="flex-1 overflow-auto p-2">
-        {loading && (
-          <div className="p-2 text-neutral-300 text-sm">Loading cameras...</div>
-        )}
+        {loading && <div className="p-2 text-neutral-300 text-sm">Loading cameras...</div>}
 
-        <div className={`grid ${gridCols} gap-2 p-2 auto-rows-[220px] md:auto-rows-[260px] lg:auto-rows-[320px]`}>
-          {items.map(({ cam, latestModified, imageUrl }) => (
+        {/* grid: 1..5 columns responsive; use group to allow hover effects that shrink other tiles */}
+        <div className={`group grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 ${autoRows} gap-2 p-2`}>
+          {items.map((it) => (
             <CameraTile
-              key={cam.id}
-              name={cam.properties?.name || `Camera ${cam.id}`}
-              municipality={cam.properties?.municipality}
-              imageUrl={imageUrl}
-              latestModified={latestModified}
+              key={it.cam.id}
+              name={it.cam.properties?.name || `Camera ${it.cam.id}`}
+              municipality={it.cam.properties?.municipality}
+              imageUrl={it.imageUrl}
+              latestModified={it.latestModified}
               showLabels={showLabels}
               cacheBuster={refreshTick}
+              onClick={() => openModal(it)}
             />
           ))}
         </div>
       </main>
+
+      {selectedItem && (
+        <Modal isOpen={true} onClose={closeModal}>
+          <div className="w-full max-w-[1200px] max-h-[90vh] overflow-auto rounded-md bg-neutral-900 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                {selectedItem.imageUrl ? (
+                  <img
+                    src={`${selectedItem.imageUrl}${selectedItem.imageUrl.includes('?') ? '&' : '?'}_cb=${refreshTick}`}
+                    alt={selectedItem.cam.properties?.name}
+                    className="w-full h-auto max-h-[80vh] object-contain rounded"
+                  />
+                ) : (
+                  <div className="w-full h-[60vh] flex items-center justify-center bg-neutral-800 text-neutral-400 rounded">
+                    No image
+                  </div>
+                )}
+              </div>
+              <div className="w-64 flex-none text-sm">
+                <div className="font-semibold text-lg mb-2">
+                  {selectedItem.cam.properties?.name}
+                </div>
+                {selectedItem.cam.properties?.municipality && (
+                  <div className="opacity-80 mb-2">{selectedItem.cam.properties.municipality}</div>
+                )}
+                {selectedItem.latestModified && (
+                  <div className="opacity-70 text-xs">
+                    Last updated: {new Date(selectedItem.latestModified).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

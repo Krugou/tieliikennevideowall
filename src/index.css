@@ -5,3 +5,20 @@
 html, body, #root {
   height: 100%;
 }
+
+/* Mobile spacing and small-screen UI adjustments */
+header h1 {
+  line-height: 1;
+}
+
+/* Hide horizontal scrollbar for CitySelector in webkit for a cleaner look */
+.city-selector {
+  -webkit-overflow-scrolling: touch;
+}
+.city-selector::-webkit-scrollbar {
+  height: 6px;
+}
+.city-selector::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}

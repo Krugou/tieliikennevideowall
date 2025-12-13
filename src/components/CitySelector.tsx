@@ -49,10 +49,17 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
   );
 
   return (
-    <div className="flex items-center gap-2">
-      {buttons}
+    <div className="flex items-center gap-2 w-full">
+      <div className="city-selector flex gap-1 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1">
+        {buttons.map((btn) =>
+          React.cloneElement(btn as any, {
+            className: `${(btn as any).props.className} px-2 py-1 text-xs min-w-[64px]`,
+          })
+        )}
+      </div>
+
       <input
-        className="ml-2 px-3 py-1 rounded bg-neutral-800 text-white text-sm outline-none"
+        className="ml-2 px-3 py-1 rounded bg-neutral-800 text-white text-sm outline-none min-w-[160px]"
         placeholder="Add cities (comma separated)"
         value={input}
         aria-label="Add cities"
