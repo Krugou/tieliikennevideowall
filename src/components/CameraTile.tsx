@@ -47,8 +47,8 @@ const CameraTileInner: React.FC<Props> = ({
       role={onClick ? 'button' : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      className="tile relative rounded-md overflow-hidden bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 transform transition-transform duration-200 ease-out will-change-transform z-0 cursor-pointer
-                 group-hover:scale-95 hover:scale-105 hover:z-10 hover:shadow-2xl"
+      className="tile relative rounded-md overflow-hidden bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 transform transition-all duration-200 ease-out will-change-transform z-0 cursor-pointer
+                 group-hover:scale-95 group-hover:opacity-90 hover:!scale-110 hover:z-30 hover:shadow-2xl hover:brightness-105"
     >
       {recent && (
         <span
