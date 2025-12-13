@@ -1,0 +1,55 @@
+{
+  "name": "tieliikennevideowall",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tieliikenne video wall using Finnish Digitraffic traffic cameras (Vite + React + Tailwind)",
+  "homepage": "./",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint './src/**/*.{ts,tsx,js,jsx}' --fix",
+    "lint:ci": "eslint './src/**/*.{ts,tsx,js,jsx}'",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install",
+    "deploy": "vite build"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.4.6",
+    "prettier": "^2.8.8",
+    "husky": "^9.0.0",
+    "lint-staged": "^13.3.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md,scss,html}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
