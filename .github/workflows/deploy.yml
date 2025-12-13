@@ -34,6 +34,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Upload build artifact (for debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./dist
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
