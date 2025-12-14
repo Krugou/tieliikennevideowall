@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { defaultCities as defaults } from "../lib/api";
 
@@ -11,29 +11,49 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
   const { t } = useTranslation();
   const [input, setInput] = useState(selectedCities.join(", "));
 
-  const toggleCity = (c: string) => {
-    const lower = c.toLowerCase();
-    const set = new Set(selectedCities.map((s) => s.toLowerCase()));
-    if (set.has(lower)) set.delete(lower);
-    else set.add(lower);
-    const arr = Array.from(set);
-    onChange(arr);
-    setInput(arr.join(", "));
-  };
+  const normalizedSelectedCities = useMemo(
+    () => selectedCities.map((s) => s.toLowerCase()),
+    [selectedCities]
+  );
 
-  const applyInput = (raw: string) => {
-    const arr = raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
-      .map((s) => s.toLowerCase());
-    onChange(arr);
-    setInput(arr.join(", "));
-  };
+  const availableCities = useMemo(() => {
+    const set = new Set<string>([...defaults, ...normalizedSelectedCities]);
+    return Array.from(set);
+  }, [normalizedSelectedCities]);
 
-  const buttons = useMemo(
+  const toggleCity = useCallback(
+    (c: string) => {
+      const lower = c.toLowerCase();
+      const set = new Set(selectedCities.map((s) => s.toLowerCase()));
+      if (set.has(lower)) set.delete(lower);
+      else set.add(lower);
+      const arr = Array.from(set);
+      onChange(arr);
+      setInput(arr.join(", "));
+    },
+    [onChange, selectedCities]
+  );
+
+  const applyInput = useCallback(
+    (raw: string) => {
+      const arr = raw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => s.toLowerCase());
+      onChange(arr);
+      setInput(arr.join(", "));
+    },
+    [onChange]
+  );
+
+  const [showAllCities, setShowAllCities] = useState(false);
+
+  const citiesToShow = showAllCities ? availableCities : defaults;
+
+  const buttons = useMemo<React.ReactElement[]>(
     () =>
-      defaults.map((c) => {
+      citiesToShow.map((c) => {
         const active = selectedCities.some((s) => s.toLowerCase() === c);
         return (
           <button
@@ -49,19 +69,24 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
           </button>
         );
       }),
-    [selectedCities, t]
+    [citiesToShow, selectedCities, t, toggleCity]
   );
 
   return (
     <div className="flex items-center gap-2 w-full">
       <div className="city-selector flex gap-1 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1">
         {buttons.map((btn) =>
-          React.cloneElement(btn as any, {
-            className: `${
-              (btn as any).props.className
-            } px-2 py-1 text-xs min-w-[64px]`,
+          React.cloneElement(btn, {
+            className: `${btn.props.className} px-2 py-1 text-xs min-w-[64px]`,
           })
         )}
+        <button
+          onClick={() => setShowAllCities(!showAllCities)}
+          className="px-2 py-1 text-xs rounded bg-neutral-700 text-white/80 hover:bg-neutral-600 min-w-[64px]"
+          title={showAllCities ? "Show fewer cities" : "Show more cities"}
+        >
+          {showAllCities ? "− Less" : "+ More"}
+        </button>
       </div>
 
       <input

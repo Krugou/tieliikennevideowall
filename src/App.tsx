@@ -31,6 +31,26 @@ const App: React.FC = () => {
           .filter(Boolean)
       : defaultCities;
 
+  // Parse reload intervals from URL params (in minutes)
+  const reloadParam = searchParams.get("reload");
+  const forceReloadParam = searchParams.get("forceReload");
+  const parsedReload = reloadParam ? parseInt(reloadParam, 10) : null;
+  const parsedForceReload = forceReloadParam
+    ? parseInt(forceReloadParam, 10)
+    : null;
+  // Validate that parsed values are positive numbers, fallback to defaults
+  const reloadIntervalMs =
+    parsedReload && parsedReload > 0 ? parsedReload * 60 * 1000 : 5 * 60 * 1000;
+  const forceReloadIntervalMs =
+    parsedForceReload && parsedForceReload > 0
+      ? parsedForceReload * 60 * 1000
+      : 30 * 60 * 1000;
+
+  // Parse showMenu param (default: true)
+  const showMenuParam = searchParams.get("showMenu");
+  const showMenu =
+    showMenuParam === null || showMenuParam.toLowerCase() !== "false";
+
   const [selectedCities, setSelectedCities] = useState<string[]>(initialCities);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<StationItem[]>([]);
@@ -119,7 +139,7 @@ const App: React.FC = () => {
       if (cancelled) return;
       await load();
       if (cancelled) return;
-      interval = setInterval(() => load(), 5 * 60 * 1000);
+      interval = setInterval(() => load(), reloadIntervalMs);
     };
     start();
 
@@ -128,17 +148,16 @@ const App: React.FC = () => {
       if (interval) clearInterval(interval);
       clearAbort();
     };
-  }, [load]);
+  }, [load, reloadIntervalMs]);
 
-  // schedule 30 minute forced refresh after a successful load, reset when refreshTick changes
+  // schedule forced refresh after a successful load, reset when refreshTick changes
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const schedule = () => {
-      const refreshMs = 30 * 60 * 1000;
-      setNextForceRefreshAt(Date.now() + refreshMs);
+      setNextForceRefreshAt(Date.now() + forceReloadIntervalMs);
       timer = setTimeout(() => {
         setRefreshTick((t) => t + 1); // force cache bust
-      }, refreshMs);
+      }, forceReloadIntervalMs);
     };
 
     // skip scheduling while loading or no cameras found
@@ -147,7 +166,7 @@ const App: React.FC = () => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [items, loading, refreshTick]);
+  }, [items, loading, refreshTick, forceReloadIntervalMs]);
 
   const manualRefresh = () => {
     rateLimitAttemptsRef.current = 0;
@@ -210,65 +229,67 @@ const App: React.FC = () => {
 
   return (
     <div className="h-full w-full flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white">
-      <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
-          <h1 className="text-lg font-semibold">{t("app.title")}</h1>
-          <div className="text-xs opacity-80 md:ml-2">
-            {new Date(now).toLocaleString(locale)}
-          </div>
-          <div className="ml-0 sm:ml-2 text-xs bg-white/5 px-2 py-1 rounded">
-            {t("app.cameras", { count: cameraCount })}
-          </div>
-          {nextRefreshRemaining !== null && (
-            <div className="ml-2 text-xs bg-blue-600/10 px-2 py-1 rounded text-blue-200">
-              {t("app.nextReload", { time: formatMs(nextRefreshRemaining) })}
+      {showMenu && (
+        <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+            <h1 className="text-lg font-semibold">{t("app.title")}</h1>
+            <div className="text-xs opacity-80 md:ml-2">
+              {new Date(now).toLocaleString(locale)}
             </div>
-          )}
-        </div>
-
-        <div className="w-full sm:w-auto flex items-center gap-2 justify-between">
-          <div className="flex-1 sm:flex-none">
-            <CitySelector
-              selectedCities={selectedCities}
-              onChange={(c) => setSelectedCities(c)}
-            />
+            <div className="ml-0 sm:ml-2 text-xs bg-white/5 px-2 py-1 rounded">
+              {t("app.cameras", { count: cameraCount })}
+            </div>
+            {nextRefreshRemaining !== null && (
+              <div className="ml-2 text-xs bg-blue-600/10 px-2 py-1 rounded text-blue-200">
+                {t("app.nextReload", { time: formatMs(nextRefreshRemaining) })}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
-            <select
-              className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
-              value={i18n.language}
-              aria-label="Language"
-              onChange={(e) => {
-                setAppLanguage(e.target.value as "fi" | "sv" | "en");
-              }}
-            >
-              <option value="fi">FI</option>
-              <option value="sv">SV</option>
-              <option value="en">EN</option>
-            </select>
-
-            <label className="inline-flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={showLabels}
-                onChange={(e) => setShowLabels(e.target.checked)}
+          <div className="w-full sm:w-auto flex items-center gap-2 justify-between">
+            <div className="flex-1 sm:flex-none">
+              <CitySelector
+                selectedCities={selectedCities}
+                onChange={(c) => setSelectedCities(c)}
               />
-              <span className="hidden sm:inline">{t("app.showLabels")}</span>
-            </label>
+            </div>
 
-            <button
-              title={t("app.refreshNow")}
-              aria-label={t("app.refreshNow")}
-              className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
-              onClick={manualRefresh}
-              disabled={loading}
-            >
-              {t("app.refresh")}
-            </button>
+            <div className="flex items-center gap-2 ml-auto">
+              <select
+                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
+                value={i18n.language}
+                aria-label="Language"
+                onChange={(e) => {
+                  setAppLanguage(e.target.value as "fi" | "sv" | "en");
+                }}
+              >
+                <option value="fi">FI</option>
+                <option value="sv">SV</option>
+                <option value="en">EN</option>
+              </select>
+
+              <label className="inline-flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={showLabels}
+                  onChange={(e) => setShowLabels(e.target.checked)}
+                />
+                <span className="hidden sm:inline">{t("app.showLabels")}</span>
+              </label>
+
+              <button
+                title={t("app.refreshNow")}
+                aria-label={t("app.refreshNow")}
+                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
+                onClick={manualRefresh}
+                disabled={loading}
+              >
+                {t("app.refresh")}
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {rateLimited && (
         <div className="m-2 p-2 bg-yellow-600/20 border border-yellow-500 text-yellow-100 text-sm rounded flex items-center justify-between">
