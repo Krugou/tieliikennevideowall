@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      injectRegister: "auto",
+      injectRegister: null,
       includeAssets: ["favicon.svg", "robots.txt"],
       manifest: {
         name: "Tieliikenne Video Wall",
@@ -41,6 +41,32 @@ export default defineConfig(({ mode }) => ({
         navigateFallback:
           mode === "development" ? "/" : "/tieliikennevideowall/index.html",
         runtimeCaching: [
+          // Always try to fetch the latest app shell when online.
+          // (Important for standalone PWA installs where users expect updates.)
+          {
+            urlPattern: ({ request, url }) => {
+              if (request.mode !== "navigate") return false;
+
+              // GitHub Pages: most in-app navigations stay at the base path with query params.
+              // Also accept /index.html and client-side routes that may resolve via 404.html.
+              const p = url.pathname;
+              return (
+                p === "/" ||
+                p === "/index.html" ||
+                p.startsWith("/tieliikennevideowall/")
+              );
+            },
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "app-shell",
+              networkTimeoutSeconds: 4,
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 24 * 60 * 60,
+              },
+              cacheableResponse: { statuses: [0, 200, 404] },
+            },
+          },
           // Cache camera images with a short TTL.
           {
             urlPattern: ({ url }) =>
@@ -71,12 +97,27 @@ export default defineConfig(({ mode }) => ({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
-          // Cache FMI XML.
+          // Cache Yr/MET Norway JSON.
           {
-            urlPattern: ({ url }) => url.origin === "https://opendata.fmi.fi",
+            urlPattern: ({ url }) => url.origin === "https://api.met.no",
             handler: "NetworkFirst",
             options: {
-              cacheName: "fmi-wfs",
+              cacheName: "yr-locationforecast",
+              networkTimeoutSeconds: 6,
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 10 * 60,
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          // Cache Open-Meteo JSON (fallback provider).
+          {
+            urlPattern: ({ url }) =>
+              url.origin === "https://api.open-meteo.com",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "open-meteo",
               networkTimeoutSeconds: 6,
               expiration: {
                 maxEntries: 60,

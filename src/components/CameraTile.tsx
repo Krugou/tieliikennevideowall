@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchFmiWeatherForCamera, FmiWeather, isRecent } from "../lib/api";
+import { fetchWeatherForCamera, isRecent, WeatherData } from "../lib/api";
 import { getLocale } from "../i18n";
 
 type Props = {
@@ -40,23 +40,19 @@ const CameraTileInner: React.FC<Props> = ({
     [imageUrl, cacheBuster]
   );
 
-  const [weather, setWeather] = useState<FmiWeather | null>(null);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
     if (!recent) {
       setWeather(null);
       return;
     }
-    if (!municipality || !coordinates) {
+    if (!coordinates) {
       setWeather(null);
       return;
     }
     const abort = new AbortController();
-    fetchFmiWeatherForCamera({
-      municipality,
-      coordinates,
-      signal: abort.signal,
-    })
+    fetchWeatherForCamera({ coordinates, signal: abort.signal })
       .then((w) => {
         if (!abort.signal.aborted) setWeather(w);
       })
@@ -64,7 +60,7 @@ const CameraTileInner: React.FC<Props> = ({
         if (!abort.signal.aborted) setWeather(null);
       });
     return () => abort.abort();
-  }, [recent, municipality, coordinates]);
+  }, [recent, coordinates]);
 
   const locale = getLocale(i18n.language);
   const formatNumber = (n: number, digits = 0) =>
@@ -96,13 +92,11 @@ const CameraTileInner: React.FC<Props> = ({
           {weather?.temperatureC !== undefined && (
             <span
               title={
-                weather.observationTime &&
-                weather.stationDistanceKm !== undefined
-                  ? t("weather.title", {
+                weather.observationTime
+                  ? t("weather.titleSimple", {
                       time: new Date(weather.observationTime).toLocaleString(
                         locale
                       ),
-                      distance: formatNumber(weather.stationDistanceKm, 0),
                     })
                   : undefined
               }

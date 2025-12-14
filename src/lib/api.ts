@@ -8,11 +8,11 @@ export type CameraFeature = {
   };
 };
 
-export type FmiWeather = {
+export type WeatherData = {
   temperatureC?: number;
   windSpeedMs?: number;
   observationTime?: string;
-  stationDistanceKm?: number;
+  source?: "yr" | "open-meteo";
 };
 
 type Preset = {
@@ -46,7 +46,7 @@ const API_BASE = "https://tie.digitraffic.fi/api/weathercam/v1";
 const DIGITRAFFIC_USER = "krugou/TieliikenneVideoWall 1.0";
 const CACHE_PREFIX = "tieliikenne_cache_v2";
 const DEFAULT_CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
-const FMI_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const YR_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 const isDev =
   typeof import.meta !== "undefined" && (import.meta as any).env?.DEV === true;
@@ -124,187 +124,166 @@ const fetchWithSignal = async (url: string, opts: RequestInit = {}) => {
   return res;
 };
 
-// ---- FMI Open Data (WFS) weather observations ----
+// ---- Yr.no (MET Norway) Locationforecast ----
 
-type FmiCandidate = {
-  lat: number;
-  lon: number;
-  latestTime?: string;
-  values: Record<string, number>;
+type YrCompactResponse = {
+  properties?: {
+    timeseries?: Array<{
+      time?: string;
+      data?: {
+        instant?: {
+          details?: {
+            air_temperature?: number;
+            wind_speed?: number;
+          };
+        };
+      };
+    }>;
+  };
 };
 
-const FMI_BASE = "https://opendata.fmi.fi/wfs";
+const YR_BASE = "https://api.met.no/weatherapi/locationforecast/2.0/compact";
+const yrInFlight = new Map<string, Promise<WeatherData | null>>();
 
-const toNumber = (v: string | null | undefined) => {
-  if (v === null || v === undefined) return undefined;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : undefined;
-};
-
-const haversineKm = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const R = 6371;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const parseFmiSimpleXml = (xml: string): FmiCandidate[] => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, "text/xml");
-
-  const members = Array.from(
-    doc.getElementsByTagNameNS("http://www.opengis.net/wfs/2.0", "member")
-  );
-  const map = new Map<string, FmiCandidate>();
-
-  for (const m of members) {
-    const pos = m
-      .getElementsByTagNameNS("http://www.opengis.net/gml/3.2", "pos")[0]
-      ?.textContent?.trim();
-    const time = m
-      .getElementsByTagNameNS("http://xml.fmi.fi/schema/wfs/2.0", "Time")[0]
-      ?.textContent?.trim();
-    const paramName = m
-      .getElementsByTagNameNS(
-        "http://xml.fmi.fi/schema/wfs/2.0",
-        "ParameterName"
-      )[0]
-      ?.textContent?.trim();
-    const paramValue = m
-      .getElementsByTagNameNS(
-        "http://xml.fmi.fi/schema/wfs/2.0",
-        "ParameterValue"
-      )[0]
-      ?.textContent?.trim();
-
-    if (!pos || !paramName || !time) continue;
-    const [latS, lonS] = pos.split(/\s+/);
-    const lat = toNumber(latS);
-    const lon = toNumber(lonS);
-    const val = toNumber(paramValue);
-    if (lat === undefined || lon === undefined || val === undefined) continue;
-
-    const key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
-    const existing = map.get(key) ?? { lat, lon, values: {} };
-
-    const prevTimeForParam = (existing.values as any)[`${paramName}__time`] as
-      | string
-      | undefined;
-    if (
-      !prevTimeForParam ||
-      new Date(time).getTime() >= new Date(prevTimeForParam).getTime()
-    ) {
-      existing.values[paramName] = val;
-      (existing.values as any)[`${paramName}__time`] = time;
-    }
-
-    if (
-      !existing.latestTime ||
-      new Date(time).getTime() > new Date(existing.latestTime).getTime()
-    ) {
-      existing.latestTime = time;
-    }
-
-    map.set(key, existing);
-  }
-
-  return Array.from(map.values());
-};
-
-const fmiInFlight = new Map<string, Promise<FmiCandidate[]>>();
-
-const fetchFmiCandidatesForPlace = async (
-  place: string,
-  signal?: AbortSignal
-) => {
-  const normalized = place.trim();
-  if (!normalized) return [] as FmiCandidate[];
-
-  const params = new URLSearchParams({
-    service: "WFS",
-    version: "2.0.0",
-    request: "getFeature",
-    storedquery_id: "fmi::observations::weather::simple",
-    place: normalized,
-    // Common observation parameters. Some stations may not provide all; we tolerate missing values.
-    parameters: "t2m,ws_10min",
-  });
-
-  const cacheKey = `fmi:simple:place:${normalized.toLowerCase()}`;
-  const cached = getLocalCache<FmiCandidate[]>(cacheKey);
-  if (cached) return cached;
-
-  const url = `${FMI_BASE}?${params.toString()}`;
-  const inflightKey = url;
-  const existing = fmiInFlight.get(inflightKey);
-  if (existing) return existing;
-
-  const p = (async () => {
-    const res = await fetch(url, {
-      signal,
-      headers: {
-        Accept: "application/xml,text/xml;q=0.9,*/*;q=0.1",
-      },
-    });
-    if (!res.ok) return [] as FmiCandidate[];
-    const xml = await res.text();
-    const candidates = parseFmiSimpleXml(xml);
-    setLocalCache(cacheKey, candidates, FMI_CACHE_TTL_MS);
-    return candidates;
-  })().finally(() => {
-    fmiInFlight.delete(inflightKey);
-  });
-
-  fmiInFlight.set(inflightKey, p);
-  return p;
-};
-
-export const fetchFmiWeatherForCamera = async (args: {
-  municipality?: string;
+export const fetchYrWeatherForCamera = async (args: {
   coordinates?: number[]; // Digitraffic cameras: [lon, lat]
   signal?: AbortSignal;
-}): Promise<FmiWeather | null> => {
-  const { municipality, coordinates, signal } = args;
-  if (!municipality || !coordinates || coordinates.length < 2) return null;
+}): Promise<WeatherData | null> => {
+  const { coordinates, signal } = args;
+  if (!coordinates || coordinates.length < 2) return null;
 
   const lon = Number(coordinates[0]);
   const lat = Number(coordinates[1]);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
 
-  const candidates = await fetchFmiCandidatesForPlace(municipality, signal);
-  if (!candidates.length) return null;
+  // Quantize to reduce cache fragmentation.
+  const keyLat = lat.toFixed(3);
+  const keyLon = lon.toFixed(3);
+  const cacheKey = `yr:compact:${keyLat},${keyLon}`;
+  const cached = getLocalCache<WeatherData>(cacheKey);
+  if (cached) return cached;
 
-  let best: FmiCandidate | null = null;
-  let bestD = Number.POSITIVE_INFINITY;
+  const inflight = yrInFlight.get(cacheKey);
+  if (inflight) return inflight;
 
-  for (const c of candidates) {
-    const d = haversineKm(lat, lon, c.lat, c.lon);
-    if (d < bestD) {
-      bestD = d;
-      best = c;
-    }
-  }
+  const p = (async () => {
+    const url = `${YR_BASE}?lat=${encodeURIComponent(
+      String(lat)
+    )}&lon=${encodeURIComponent(String(lon))}`;
+    const res = await fetch(url, {
+      signal,
+      headers: {
+        Accept: "application/json",
+        // Note: browsers do not allow setting the User-Agent header.
+      },
+    });
+    if (!res.ok) return null;
 
-  if (!best) return null;
-  return {
-    temperatureC: best.values.t2m,
-    windSpeedMs: best.values.ws_10min,
-    observationTime: best.latestTime,
-    stationDistanceKm: Number.isFinite(bestD) ? bestD : undefined,
+    const data = (await safeJson<YrCompactResponse>(res)) ?? undefined;
+    const series = data?.properties?.timeseries ?? [];
+    const ts = series.find((x) => {
+      const d = x?.data?.instant?.details;
+      return typeof d?.air_temperature === "number";
+    });
+    const details = ts?.data?.instant?.details;
+
+    const temp = details?.air_temperature;
+    if (typeof temp !== "number" || !Number.isFinite(temp)) return null;
+
+    const out: WeatherData = {
+      source: "yr",
+      observationTime: ts?.time,
+      temperatureC: temp,
+      windSpeedMs: details?.wind_speed,
+    };
+
+    setLocalCache(cacheKey, out, YR_CACHE_TTL_MS);
+    return out;
+  })().finally(() => {
+    yrInFlight.delete(cacheKey);
+  });
+
+  yrInFlight.set(cacheKey, p);
+  return p;
+};
+
+// ---- Open-Meteo fallback (CORS-friendly) ----
+
+type OpenMeteoCurrentResponse = {
+  current?: {
+    time?: string;
+    temperature_2m?: number;
+    wind_speed_10m?: number;
   };
+};
+
+const OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast";
+const openMeteoInFlight = new Map<string, Promise<WeatherData | null>>();
+
+export const fetchOpenMeteoWeatherForCamera = async (args: {
+  coordinates?: number[]; // [lon, lat]
+  signal?: AbortSignal;
+}): Promise<WeatherData | null> => {
+  const { coordinates, signal } = args;
+  if (!coordinates || coordinates.length < 2) return null;
+
+  const lon = Number(coordinates[0]);
+  const lat = Number(coordinates[1]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+  const keyLat = lat.toFixed(3);
+  const keyLon = lon.toFixed(3);
+  const cacheKey = `open-meteo:current:${keyLat},${keyLon}`;
+  const cached = getLocalCache<WeatherData>(cacheKey);
+  if (cached) return cached;
+
+  const inflight = openMeteoInFlight.get(cacheKey);
+  if (inflight) return inflight;
+
+  const p = (async () => {
+    const url =
+      `${OPEN_METEO_BASE}` +
+      `?latitude=${encodeURIComponent(String(lat))}` +
+      `&longitude=${encodeURIComponent(String(lon))}` +
+      `&current=temperature_2m,wind_speed_10m` +
+      `&wind_speed_unit=ms` +
+      `&timezone=UTC`;
+
+    const res = await fetch(url, {
+      signal,
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+
+    const data = (await safeJson<OpenMeteoCurrentResponse>(res)) ?? undefined;
+    const temp = data?.current?.temperature_2m;
+    if (typeof temp !== "number" || !Number.isFinite(temp)) return null;
+
+    const out: WeatherData = {
+      source: "open-meteo",
+      observationTime: data?.current?.time,
+      temperatureC: temp,
+      windSpeedMs: data?.current?.wind_speed_10m,
+    };
+
+    setLocalCache(cacheKey, out, YR_CACHE_TTL_MS);
+    return out;
+  })().finally(() => {
+    openMeteoInFlight.delete(cacheKey);
+  });
+
+  openMeteoInFlight.set(cacheKey, p);
+  return p;
+};
+
+// Preferred weather fetch: try Yr first, then fall back.
+export const fetchWeatherForCamera = async (args: {
+  coordinates?: number[];
+  signal?: AbortSignal;
+}): Promise<WeatherData | null> => {
+  const yr = await fetchYrWeatherForCamera(args);
+  if (yr?.temperatureC !== undefined) return yr;
+  return fetchOpenMeteoWeatherForCamera(args);
 };
 
 // simple concurrency pool to avoid spamming the API with many parallel requests

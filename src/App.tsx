@@ -18,18 +18,51 @@ type StationItem = {
   imageUrl?: string;
 };
 
+const MY_CITIES_KEY = "tieliikenne_my_cities_v1";
+const ONBOARDED_KEY = "tieliikenne_onboarded_v1";
+
+const parseCitiesCsv = (raw: string) =>
+  raw
+    .split(",")
+    .map((c) => c.trim().toLowerCase())
+    .filter(Boolean);
+
+const readStoredCities = (): string[] | null => {
+  try {
+    const raw = localStorage.getItem(MY_CITIES_KEY);
+    if (!raw) return null;
+    const arr = parseCitiesCsv(raw);
+    return arr.length ? arr : null;
+  } catch {
+    return null;
+  }
+};
+
+const hasCompletedOnboarding = (): boolean => {
+  try {
+    return localStorage.getItem(ONBOARDED_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const searchParams = new URL(window.location.href).searchParams;
   const queryCities =
     searchParams.get("cities") || searchParams.get("city") || "";
+
+  const storedCities =
+    queryCities.trim().length > 0 ? null : readStoredCities();
   const initialCities =
     queryCities.trim().length > 0
-      ? queryCities
-          .split(",")
-          .map((c) => c.trim().toLowerCase())
-          .filter(Boolean)
-      : defaultCities;
+      ? parseCitiesCsv(queryCities)
+      : storedCities ?? defaultCities;
+
+  const shouldOnboard =
+    queryCities.trim().length === 0 &&
+    storedCities == null &&
+    !hasCompletedOnboarding();
 
   // Parse reload intervals from URL params (in minutes)
   const reloadParam = searchParams.get("reload");
@@ -57,6 +90,20 @@ const App: React.FC = () => {
   const [rateLimited, setRateLimited] = useState(false);
   const [retryAt, setRetryAt] = useState<number | null>(null);
   const [showLabels, setShowLabels] = useState(true);
+
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(shouldOnboard);
+  const [isOnboarding, setIsOnboarding] = useState<boolean>(shouldOnboard);
+
+  // Persist user preference once onboarding is complete.
+  useEffect(() => {
+    if (isOnboarding) return;
+    try {
+      localStorage.setItem(MY_CITIES_KEY, selectedCities.join(","));
+      localStorage.setItem(ONBOARDED_KEY, "1");
+    } catch {
+      // ignore
+    }
+  }, [isOnboarding, selectedCities]);
 
   // new: state for forced 30 minute refresh
   const [refreshTick, setRefreshTick] = useState(0);
@@ -227,6 +274,32 @@ const App: React.FC = () => {
     };
   }, [selectedItem]);
 
+  const saveMyCities = () => {
+    try {
+      localStorage.setItem(MY_CITIES_KEY, selectedCities.join(","));
+      localStorage.setItem(ONBOARDED_KEY, "1");
+    } catch {
+      // ignore
+    }
+    setIsOnboarding(false);
+    setSettingsOpen(false);
+  };
+
+  const SettingsIcon = (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      aria-hidden="true"
+      className="opacity-90"
+    >
+      <path
+        fill="currentColor"
+        d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.07 7.07 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.23-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 7.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.83 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.31.6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54c.04.24.25.42.49.42h3.8c.24 0 .45-.18.49-.42l.36-2.54c.58-.23 1.12-.54 1.63-.94l2.39.96c.22.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"
+      />
+    </svg>
+  );
+
   return (
     <div className="h-full w-full flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white">
       {showMenu && (
@@ -255,6 +328,17 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 ml-auto">
+              <button
+                type="button"
+                title={t("app.settings")}
+                aria-label={t("settings.open")}
+                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10 inline-flex items-center gap-2"
+                onClick={() => setSettingsOpen(true)}
+              >
+                {SettingsIcon}
+                <span className="hidden sm:inline">{t("app.settings")}</span>
+              </button>
+
               <select
                 className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
                 value={i18n.language}
@@ -315,6 +399,18 @@ const App: React.FC = () => {
       )}
 
       <main className="flex-1 overflow-auto p-2">
+        {!showMenu && (
+          <button
+            type="button"
+            title={t("app.settings")}
+            aria-label={t("settings.open")}
+            className="fixed bottom-4 right-4 z-40 rounded-full bg-white/10 hover:bg-white/20 p-3 backdrop-blur"
+            onClick={() => setSettingsOpen(true)}
+          >
+            {SettingsIcon}
+          </button>
+        )}
+
         {loading && (
           <div className="p-2 text-neutral-300 text-sm">
             {t("app.loadingCameras")}
@@ -383,6 +479,64 @@ const App: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      <Modal
+        isOpen={settingsOpen}
+        onClose={() => {
+          // Require a choice on first run.
+          if (isOnboarding) return;
+          setSettingsOpen(false);
+        }}
+      >
+        <div className="w-full max-w-[900px] rounded-md bg-neutral-900 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-lg font-semibold">{t("settings.title")}</div>
+              <div className="text-sm opacity-80 mt-1">
+                {t("settings.intro")}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <CitySelector
+              selectedCities={selectedCities}
+              onChange={(c) => setSelectedCities(c)}
+            />
+          </div>
+
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showLabels}
+                onChange={(e) => setShowLabels(e.target.checked)}
+              />
+              <span>{t("app.showLabels")}</span>
+            </label>
+
+            <div className="flex items-center gap-2">
+              {!isOnboarding && (
+                <button
+                  type="button"
+                  className="px-3 py-2 rounded bg-white/5 hover:bg-white/10 text-sm"
+                  onClick={() => setSettingsOpen(false)}
+                >
+                  {t("modal.close")}
+                </button>
+              )}
+              <button
+                type="button"
+                className="px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 text-sm disabled:opacity-50"
+                disabled={selectedCities.length === 0}
+                onClick={saveMyCities}
+              >
+                {t("settings.save")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

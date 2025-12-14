@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -19,9 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "paths": {
-      "@/*": [
-        "*"
-      ]
+      "@/*": ["*"]
     },
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo",
@@ -32,16 +26,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "resolvePackageJsonExports": true,
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client", "vite-plugin-pwa/client"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build"]
 }

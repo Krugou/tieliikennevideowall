@@ -83,9 +83,9 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
         <button
           onClick={() => setShowAllCities(!showAllCities)}
           className="px-2 py-1 text-xs rounded bg-neutral-700 text-white/80 hover:bg-neutral-600 min-w-[64px]"
-          title={showAllCities ? "Show fewer cities" : "Show more cities"}
+          title={showAllCities ? t("city.showLess") : t("city.showMore")}
         >
-          {showAllCities ? "− Less" : "+ More"}
+          {showAllCities ? t("city.showLess") : t("city.showMore")}
         </button>
       </div>
 

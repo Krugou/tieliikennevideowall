@@ -47,11 +47,21 @@ const resources = {
         refresh: "Refresh",
         refreshNow: "Refresh now",
         loadingCameras: "Loading cameras...",
+        settings: "Settings",
       },
       city: {
         addPlaceholder: "Add cities (comma separated)",
         addAria: "Add cities",
         toggleTitle: "Toggle {{city}}",
+        showMore: "+ More",
+        showLess: "− Less",
+      },
+      settings: {
+        title: "My cities",
+        intro:
+          "Choose which cities you want to follow. You can change this later from Settings.",
+        save: "Save",
+        open: "Open settings",
       },
       camera: {
         updatedRecentTitle: "Updated < 1h",
@@ -60,6 +70,7 @@ const resources = {
       },
       modal: {
         lastUpdated: "Last updated: {{time}}",
+        close: "Close",
       },
       rateLimit: {
         banner: "API rate-limited. Retrying in {{time}}",
@@ -69,6 +80,7 @@ const resources = {
         compactTemp: "{{temp}}°C",
         compactTempWind: "{{temp}}°C · {{wind}} m/s",
         title: "Weather observation {{time}} ({{distance}} km)",
+        titleSimple: "Weather forecast {{time}}",
       },
     },
   },
@@ -82,11 +94,21 @@ const resources = {
         refresh: "Päivitä",
         refreshNow: "Päivitä nyt",
         loadingCameras: "Ladataan kameroita...",
+        settings: "Asetukset",
       },
       city: {
         addPlaceholder: "Lisää kaupunkeja (pilkuilla eroteltuna)",
         addAria: "Lisää kaupunkeja",
         toggleTitle: "Vaihda {{city}}",
+        showMore: "+ Lisää",
+        showLess: "− Vähemmän",
+      },
+      settings: {
+        title: "Omat kaupungit",
+        intro:
+          "Valitse kaupungit, joiden kameroita haluat seurata. Voit muuttaa valintaa myöhemmin asetuksista.",
+        save: "Tallenna",
+        open: "Avaa asetukset",
       },
       camera: {
         updatedRecentTitle: "Päivitetty < 1 h",
@@ -95,6 +117,7 @@ const resources = {
       },
       modal: {
         lastUpdated: "Viimeksi päivitetty: {{time}}",
+        close: "Sulje",
       },
       rateLimit: {
         banner:
@@ -105,6 +128,7 @@ const resources = {
         compactTemp: "{{temp}}°C",
         compactTempWind: "{{temp}}°C · {{wind}} m/s",
         title: "Säähavainto {{time}} ({{distance}} km)",
+        titleSimple: "Sääennuste {{time}}",
       },
     },
   },
@@ -118,11 +142,21 @@ const resources = {
         refresh: "Uppdatera",
         refreshNow: "Uppdatera nu",
         loadingCameras: "Laddar kameror...",
+        settings: "Inställningar",
       },
       city: {
         addPlaceholder: "Lägg till städer (komma-separerat)",
         addAria: "Lägg till städer",
         toggleTitle: "Växla {{city}}",
+        showMore: "+ Mer",
+        showLess: "− Mindre",
+      },
+      settings: {
+        title: "Mina städer",
+        intro:
+          "Välj vilka städer du vill följa. Du kan ändra detta senare i Inställningar.",
+        save: "Spara",
+        open: "Öppna inställningar",
       },
       camera: {
         updatedRecentTitle: "Uppdaterad < 1 h",
@@ -131,6 +165,7 @@ const resources = {
       },
       modal: {
         lastUpdated: "Senast uppdaterad: {{time}}",
+        close: "Stäng",
       },
       rateLimit: {
         banner: "API hastighetsbegränsad. Försöker igen om {{time}}",
@@ -140,6 +175,7 @@ const resources = {
         compactTemp: "{{temp}}°C",
         compactTempWind: "{{temp}}°C · {{wind}} m/s",
         title: "Väderobservation {{time}} ({{distance}} km)",
+        titleSimple: "Väderprognos {{time}}",
       },
     },
   },
