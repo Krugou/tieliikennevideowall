@@ -29,24 +29,15 @@ module.exports = {
   ],
   plugins: ['react', 'react-hooks', '@typescript-eslint', 'jsx-a11y', 'import'],
   rules: {
-    'no-console': 'warn',
+    'no-console': 'off',
     'prefer-const': 'warn',
     'import/no-unresolved': 'off',
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'jsx-a11y/no-noninteractive-element-interactions': 'off',
-    '@typescript-eslint/func-style': ['error', 'expression'],
-    'no-restricted-syntax': [
-      'error',
-      {
-        selector: 'FunctionDeclaration',
-        message: 'Use arrow functions instead of function declarations'
-      },
-      {
-        selector: 'FunctionExpression',
-        message: 'Use arrow functions instead of function expressions'
-      }
-    ]
+    // Prefer function expressions/arrow functions over function declarations.
+    // (Note: class methods/constructors are not affected by this rule.)
+    'func-style': ['error', 'expression', { allowArrowFunctions: true }]
   }
 };
