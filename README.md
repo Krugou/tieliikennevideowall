@@ -37,12 +37,10 @@ URL Parameters:
 - `showMenu` - Show/hide the top menu (default: true, use `?showMenu=false` to hide)
 
 Available Cities:
-The app includes 30+ Finnish cities with traffic cameras:
-- **Default**: Helsinki, Espoo, Vantaa
-- **Major cities**: Tampere, Turku, Oulu, Jyväskylä, Lahti, Kuopio, Pori, Kouvola, Joensuu, Lappeenranta
-- **Other cities**: Hämeenlinna, Vaasa, Seinäjoki, Rovaniemi, Mikkeli, Kotka, Salo, Porvoo, Kokkola, Hyvinkää, Nurmijärvi, Järvenpää, Rauma, Tuusula, Kirkkonummi, Kajaani, Kerava, Nokia, Ylöjärvi, Kangasala
-
-You can also enter any city name in the text input field. The app will search for cameras in that area.
+- **Default cities**: Helsinki, Espoo, Vantaa
+- The app includes 30+ Finnish cities with traffic cameras. Click the "+ More" button in the UI to see and select from the full list.
+- The complete list is maintained in `src/lib/api.ts` as `availableCities`.
+- You can also enter any city name in the text input field. The app will search for cameras in that area.
 
 Usage Examples:
 ```

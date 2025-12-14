@@ -25,8 +25,11 @@ const App: React.FC = () => {
   // Parse reload intervals from URL params (in minutes)
   const reloadParam = searchParams.get('reload');
   const forceReloadParam = searchParams.get('forceReload');
-  const reloadIntervalMs = reloadParam ? parseInt(reloadParam, 10) * 60 * 1000 : 5 * 60 * 1000;
-  const forceReloadIntervalMs = forceReloadParam ? parseInt(forceReloadParam, 10) * 60 * 1000 : 30 * 60 * 1000;
+  const parsedReload = reloadParam ? parseInt(reloadParam, 10) : null;
+  const parsedForceReload = forceReloadParam ? parseInt(forceReloadParam, 10) : null;
+  // Validate that parsed values are positive numbers, fallback to defaults
+  const reloadIntervalMs = parsedReload && parsedReload > 0 ? parsedReload * 60 * 1000 : 5 * 60 * 1000;
+  const forceReloadIntervalMs = parsedForceReload && parsedForceReload > 0 ? parsedForceReload * 60 * 1000 : 30 * 60 * 1000;
 
   // Parse showMenu param (default: true)
   const showMenuParam = searchParams.get('showMenu');

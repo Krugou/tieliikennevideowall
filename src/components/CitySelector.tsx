@@ -9,7 +9,7 @@ type Props = {
 const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
   const [input, setInput] = useState(selectedCities.join(', '));
 
-  const toggleCity = React.useCallback((c: string) => {
+  const toggleCity = (c: string) => {
     const lower = c.toLowerCase();
     const set = new Set(selectedCities.map((s) => s.toLowerCase()));
     if (set.has(lower)) set.delete(lower);
@@ -17,7 +17,7 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
     const arr = Array.from(set);
     onChange(arr);
     setInput(arr.join(', '));
-  }, [selectedCities, onChange]);
+  };
 
   const applyInput = (raw: string) => {
     const arr = raw
@@ -49,7 +49,8 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
           </button>
         );
       }),
-    [selectedCities, citiesToShow, toggleCity]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedCities, citiesToShow]
   );
 
   return (
