@@ -22,6 +22,19 @@ const App: React.FC = () => {
           .filter(Boolean)
       : defaultCities;
 
+  // Parse reload intervals from URL params (in minutes)
+  const reloadParam = searchParams.get('reload');
+  const forceReloadParam = searchParams.get('forceReload');
+  const parsedReload = reloadParam ? parseInt(reloadParam, 10) : null;
+  const parsedForceReload = forceReloadParam ? parseInt(forceReloadParam, 10) : null;
+  // Validate that parsed values are positive numbers, fallback to defaults
+  const reloadIntervalMs = parsedReload && parsedReload > 0 ? parsedReload * 60 * 1000 : 5 * 60 * 1000;
+  const forceReloadIntervalMs = parsedForceReload && parsedForceReload > 0 ? parsedForceReload * 60 * 1000 : 30 * 60 * 1000;
+
+  // Parse showMenu param (default: true)
+  const showMenuParam = searchParams.get('showMenu');
+  const showMenu = showMenuParam === null || showMenuParam.toLowerCase() !== 'false';
+
   const [selectedCities, setSelectedCities] = useState<string[]>(initialCities);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<StationItem[]>([]);
@@ -46,7 +59,7 @@ const App: React.FC = () => {
   };
 
   const load = useCallback(
-    async ({ force = false } = {}) => {
+    async () => {
       clearAbort();
       const abort = new AbortController();
       abortRef.current = abort;
@@ -72,7 +85,7 @@ const App: React.FC = () => {
           setRetryAt(Date.now() + backoffMs);
           // schedule retry
           setTimeout(() => {
-            if (!abort.signal.aborted) load({ force: true });
+            if (!abort.signal.aborted) load();
           }, backoffMs);
         } else if ((err as DOMException)?.name === 'AbortError') {
           // ignore user-initiated abort
@@ -108,7 +121,7 @@ const App: React.FC = () => {
       if (cancelled) return;
       await load();
       if (cancelled) return;
-      interval = setInterval(() => load(), 5 * 60 * 1000);
+      interval = setInterval(() => load(), reloadIntervalMs);
     };
     start();
 
@@ -117,17 +130,16 @@ const App: React.FC = () => {
       if (interval) clearInterval(interval);
       clearAbort();
     };
-  }, [load]);
+  }, [load, reloadIntervalMs]);
 
-  // schedule 30 minute forced refresh after a successful load, reset when refreshTick changes
+  // schedule forced refresh after a successful load, reset when refreshTick changes
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const schedule = () => {
-      const refreshMs = 30 * 60 * 1000;
-      setNextForceRefreshAt(Date.now() + refreshMs);
+      setNextForceRefreshAt(Date.now() + forceReloadIntervalMs);
       timer = setTimeout(() => {
         setRefreshTick((t) => t + 1); // force cache bust
-      }, refreshMs);
+      }, forceReloadIntervalMs);
     };
 
     // skip scheduling while loading or no cameras found
@@ -136,14 +148,14 @@ const App: React.FC = () => {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [items, loading, refreshTick]);
+  }, [items, loading, refreshTick, forceReloadIntervalMs]);
 
   const manualRefresh = () => {
     rateLimitAttemptsRef.current = 0;
     setRefreshTick((t) => t + 1);
     setRetryAt(null);
     setRateLimited(false);
-    load({ force: true });
+    load();
   };
 
   // row heights for mobile -> desktop
@@ -195,7 +207,8 @@ const App: React.FC = () => {
 
   return (
     <div className="h-full w-full flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white">
-      <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      {showMenu && (
+        <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
           <h1 className="text-lg font-semibold">Tieliikenne Video Wall</h1>
           <div className="text-xs opacity-80 md:ml-2">{new Date(now).toLocaleString()}</div>
@@ -233,7 +246,8 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
-      </header>
+        </header>
+      )}
 
       {rateLimited && (
         <div className="m-2 p-2 bg-yellow-600/20 border border-yellow-500 text-yellow-100 text-sm rounded flex items-center justify-between">

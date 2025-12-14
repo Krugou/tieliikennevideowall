@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { defaultCities as defaults } from '../lib/api';
+import { defaultCities as defaults, availableCities } from '../lib/api';
 
 type Props = {
   selectedCities: string[];
@@ -29,9 +29,13 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
     setInput(arr.join(', '));
   };
 
+  const [showAllCities, setShowAllCities] = useState(false);
+
+  const citiesToShow = showAllCities ? availableCities : defaults;
+
   const buttons = useMemo(
     () =>
-      defaults.map((c) => {
+      citiesToShow.map((c) => {
         const active = selectedCities.some((s) => s.toLowerCase() === c);
         return (
           <button
@@ -45,7 +49,8 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
           </button>
         );
       }),
-    [selectedCities]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedCities, citiesToShow]
   );
 
   return (
@@ -56,6 +61,13 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
             className: `${(btn as any).props.className} px-2 py-1 text-xs min-w-[64px]`,
           })
         )}
+        <button
+          onClick={() => setShowAllCities(!showAllCities)}
+          className="px-2 py-1 text-xs rounded bg-neutral-700 text-white/80 hover:bg-neutral-600 min-w-[64px]"
+          title={showAllCities ? 'Show fewer cities' : 'Show more cities'}
+        >
+          {showAllCities ? '− Less' : '+ More'}
+        </button>
       </div>
 
       <input

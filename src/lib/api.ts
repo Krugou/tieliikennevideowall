@@ -165,6 +165,43 @@ const fetchLatestHistory = async (stationId: string, signal?: AbortSignal) => {
 
 export const defaultCities = ['vantaa', 'espoo', 'helsinki'];
 
+// Available Finnish cities with traffic cameras
+export const availableCities = [
+  'helsinki',
+  'espoo',
+  'vantaa',
+  'tampere',
+  'turku',
+  'oulu',
+  'jyväskylä',
+  'lahti',
+  'kuopio',
+  'pori',
+  'kouvola',
+  'joensuu',
+  'lappeenranta',
+  'hämeenlinna',
+  'vaasa',
+  'seinäjoki',
+  'rovaniemi',
+  'mikkeli',
+  'kotka',
+  'salo',
+  'porvoo',
+  'kokkola',
+  'hyvinkää',
+  'nurmijärvi',
+  'järvenpää',
+  'rauma',
+  'tuusula',
+  'kirkkonummi',
+  'kajaani',
+  'kerava',
+  'nokia',
+  'ylöjärvi',
+  'kangasala',
+];
+
 export const fetchStations = async (
   cityOrCities?: string | string[],
   opts?: {
