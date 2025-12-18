@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import Modal from "./Modal";
 
 type CameraLocation = {
@@ -17,30 +19,83 @@ type Props = {
 
 const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
   const { t } = useTranslation();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
-  // Finland bounding box (approximate)
-  // Longitude: 19.5°E to 31.5°E (width ~12°)
-  // Latitude: 59.5°N to 70.5°N (height ~11°)
-  const minLon = 19.5;
-  const maxLon = 31.5;
-  const minLat = 59.5;
-  const maxLat = 70.5;
+  useEffect(() => {
+    // Only initialize the map when modal is open and container is available
+    if (!isOpen || !mapContainerRef.current) return;
 
-  const mapWidth = 800;
-  const mapHeight = 900;
-  const padding = 40;
+    // Clean up existing map if any
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
 
-  // Convert lat/lon to SVG coordinates
-  const lonToX = (lon: number) => {
-    const normalized = (lon - minLon) / (maxLon - minLon);
-    return padding + normalized * (mapWidth - 2 * padding);
-  };
+    // Initialize Leaflet map
+    const map = L.map(mapContainerRef.current, {
+      center: [64.0, 26.0], // Center of Finland
+      zoom: 6,
+      zoomControl: true, // Enable zoom controls
+    });
 
-  const latToY = (lat: number) => {
-    const normalized = (lat - minLat) / (maxLat - minLat);
-    // Invert Y axis (SVG coordinates increase downward)
-    return mapHeight - padding - normalized * (mapHeight - 2 * padding);
-  };
+    mapRef.current = map;
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    // Create custom icon for camera markers
+    const cameraIcon = L.divIcon({
+      className: "custom-camera-marker",
+      html: '<div style="width: 12px; height: 12px; background-color: #3b82f6; border: 2px solid #60a5fa; border-radius: 50%;"></div>',
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+    });
+
+    // Add markers for cameras and collect bounds
+    const bounds: L.LatLngBounds[] = [];
+    cameras.forEach((camera) => {
+      const [lon, lat] = camera.coordinates;
+      if (
+        lon === undefined ||
+        lat === undefined ||
+        !Number.isFinite(lon) ||
+        !Number.isFinite(lat)
+      ) {
+        return;
+      }
+
+      const marker = L.marker([lat, lon], { icon: cameraIcon }).addTo(map);
+      marker.bindPopup(
+        `<strong>${camera.name}</strong>${
+          camera.municipality ? `<br/>${camera.municipality}` : ""
+        }`
+      );
+
+      bounds.push(L.latLngBounds([lat, lon], [lat, lon]));
+    });
+
+    // Fit map to show all markers
+    if (bounds.length > 0) {
+      const combinedBounds = bounds.reduce(
+        (acc, bound) => acc.extend(bound),
+        bounds[0]!
+      );
+      map.fitBounds(combinedBounds, { padding: [50, 50] });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [isOpen, cameras]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -52,81 +107,11 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
           </p>
         </div>
 
-        <div className="bg-neutral-950 rounded-lg p-4 overflow-auto">
-          <svg
-            viewBox={`0 0 ${mapWidth} ${mapHeight}`}
-            className="w-full h-auto"
-            style={{ maxHeight: "70vh" }}
-          >
-            {/* Grid lines for reference */}
-            <defs>
-              <pattern
-                id="grid"
-                width="50"
-                height="50"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  d="M 50 0 L 0 0 0 50"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.05)"
-                  strokeWidth="0.5"
-                />
-              </pattern>
-            </defs>
-            <rect width={mapWidth} height={mapHeight} fill="url(#grid)" />
-
-            {/* Camera markers */}
-            {cameras.map((camera) => {
-              const [lon, lat] = camera.coordinates;
-              if (
-                lon === undefined ||
-                lat === undefined ||
-                !Number.isFinite(lon) ||
-                !Number.isFinite(lat)
-              ) {
-                return null;
-              }
-
-              const x = lonToX(lon);
-              const y = latToY(lat);
-
-              return (
-                <g key={camera.id}>
-                  {/* Camera marker */}
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r="4"
-                    fill="#3b82f6"
-                    stroke="#60a5fa"
-                    strokeWidth="1"
-                    className="hover:fill-blue-400 cursor-pointer transition-colors"
-                  />
-                  {/* Tooltip on hover */}
-                  <title>
-                    {camera.name}
-                    {camera.municipality ? ` - ${camera.municipality}` : ""}
-                  </title>
-                </g>
-              );
-            })}
-
-            {/* Legend */}
-            <g transform={`translate(${padding}, ${mapHeight - padding + 10})`}>
-              <circle cx="0" cy="0" r="4" fill="#3b82f6" stroke="#60a5fa" />
-              <text
-                x="10"
-                y="4"
-                fill="white"
-                fontSize="12"
-                className="select-none"
-              >
-                {t("map.legend")}
-              </text>
-            </g>
-          </svg>
-        </div>
+        <div
+          ref={mapContainerRef}
+          className="w-full h-[70vh] rounded-lg overflow-hidden"
+          style={{ minHeight: "400px" }}
+        />
 
         {/* Camera list */}
         <div className="mt-4 max-h-48 overflow-y-auto">
