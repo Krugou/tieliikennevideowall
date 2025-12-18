@@ -77,8 +77,17 @@ const resources = {
       map: {
         title: "Camera Locations",
         cameraCount: "Showing {{count}} cameras",
+        routeCameraCount:
+          "Showing {{count}} cameras along route ({{total}} total)",
         legend: "Camera location",
         showList: "Show camera list ({{count}})",
+        clickCameraForRoute:
+          "Click on a camera to show route from your location",
+        routeToTarget: "Route to target",
+        calculatingRoute: "Calculating route...",
+        clearRoute: "Clear route",
+        enableLocationForRoute:
+          "Enable location access to show routes to cameras",
       },
       rateLimit: {
         banner: "API rate-limited. Retrying in {{time}}",
@@ -132,8 +141,16 @@ const resources = {
       map: {
         title: "Kamerasijainnit",
         cameraCount: "Näytetään {{count}} kameraa",
+        routeCameraCount:
+          "Näytetään {{count}} kameraa reitillä ({{total}} yhteensä)",
         legend: "Kameran sijainti",
         showList: "Näytä kameralista ({{count}})",
+        clickCameraForRoute: "Klikkaa kameraa nähdäksesi reitin sijainnistasi",
+        routeToTarget: "Reitti kohteeseen",
+        calculatingRoute: "Lasketaan reittiä...",
+        clearRoute: "Tyhjennä reitti",
+        enableLocationForRoute:
+          "Salli sijaintilupa nähdäksesi reitit kameroille",
       },
       rateLimit: {
         banner:
@@ -188,8 +205,17 @@ const resources = {
       map: {
         title: "Kamerapositioner",
         cameraCount: "Visar {{count}} kameror",
+        routeCameraCount:
+          "Visar {{count}} kameror längs rutt ({{total}} totalt)",
         legend: "Kameraposition",
         showList: "Visa kameralista ({{count}})",
+        clickCameraForRoute:
+          "Klicka på en kamera för att visa rutt från din plats",
+        routeToTarget: "Rutt till mål",
+        calculatingRoute: "Beräknar rutt...",
+        clearRoute: "Rensa rutt",
+        enableLocationForRoute:
+          "Aktivera platsåtkomst för att visa rutter till kameror",
       },
       rateLimit: {
         banner: "API hastighetsbegränsad. Försöker igen om {{time}}",
