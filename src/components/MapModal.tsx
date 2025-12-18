@@ -51,13 +51,13 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
     // Create custom icon for camera markers
     const cameraIcon = L.divIcon({
       className: "custom-camera-marker",
-      html: '<div style="width: 12px; height: 12px; background-color: #3b82f6; border: 2px solid #60a5fa; border-radius: 50%;"></div>',
+      html: '<div class="w-3 h-3 bg-blue-600 border-2 border-blue-400 rounded-full"></div>',
       iconSize: [12, 12],
       iconAnchor: [6, 6],
     });
 
-    // Add markers for cameras and collect bounds
-    const bounds: L.LatLngBounds[] = [];
+    // Add markers for cameras and collect coordinates for bounds
+    const coordinates: L.LatLngExpression[] = [];
     cameras.forEach((camera) => {
       const [lon, lat] = camera.coordinates;
       if (
@@ -76,16 +76,13 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
         }`
       );
 
-      bounds.push(L.latLngBounds([lat, lon], [lat, lon]));
+      coordinates.push([lat, lon]);
     });
 
     // Fit map to show all markers
-    if (bounds.length > 0) {
-      const combinedBounds = bounds.reduce(
-        (acc, bound) => acc.extend(bound),
-        bounds[0]!
-      );
-      map.fitBounds(combinedBounds, { padding: [50, 50] });
+    if (coordinates.length > 0) {
+      const bounds = L.latLngBounds(coordinates);
+      map.fitBounds(bounds, { padding: [50, 50] });
     }
 
     // Cleanup on unmount
@@ -109,8 +106,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
         <div
           ref={mapContainerRef}
-          className="w-full h-[70vh] rounded-lg overflow-hidden"
-          style={{ minHeight: "400px" }}
+          className="w-full h-[70vh] min-h-[400px] rounded-lg overflow-hidden"
         />
 
         {/* Camera list */}
