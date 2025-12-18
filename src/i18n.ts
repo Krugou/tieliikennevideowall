@@ -48,6 +48,8 @@ const resources = {
         refreshNow: "Refresh now",
         loadingCameras: "Loading cameras...",
         settings: "Settings",
+        map: "Map",
+        showMap: "Show camera locations on map",
       },
       city: {
         addPlaceholder: "Add cities (comma separated)",
@@ -72,6 +74,12 @@ const resources = {
         lastUpdated: "Last updated: {{time}}",
         close: "Close",
       },
+      map: {
+        title: "Camera Locations",
+        cameraCount: "Showing {{count}} cameras",
+        legend: "Camera location",
+        showList: "Show camera list ({{count}})",
+      },
       rateLimit: {
         banner: "API rate-limited. Retrying in {{time}}",
         retryNow: "Retry now",
@@ -95,6 +103,8 @@ const resources = {
         refreshNow: "Päivitä nyt",
         loadingCameras: "Ladataan kameroita...",
         settings: "Asetukset",
+        map: "Kartta",
+        showMap: "Näytä kamerasijainnit kartalla",
       },
       city: {
         addPlaceholder: "Lisää kaupunkeja (pilkuilla eroteltuna)",
@@ -118,6 +128,12 @@ const resources = {
       modal: {
         lastUpdated: "Viimeksi päivitetty: {{time}}",
         close: "Sulje",
+      },
+      map: {
+        title: "Kamerasijainnit",
+        cameraCount: "Näytetään {{count}} kameraa",
+        legend: "Kameran sijainti",
+        showList: "Näytä kameralista ({{count}})",
       },
       rateLimit: {
         banner:
@@ -143,6 +159,8 @@ const resources = {
         refreshNow: "Uppdatera nu",
         loadingCameras: "Laddar kameror...",
         settings: "Inställningar",
+        map: "Karta",
+        showMap: "Visa kamerapositioner på kartan",
       },
       city: {
         addPlaceholder: "Lägg till städer (komma-separerat)",
@@ -166,6 +184,12 @@ const resources = {
       modal: {
         lastUpdated: "Senast uppdaterad: {{time}}",
         close: "Stäng",
+      },
+      map: {
+        title: "Kamerapositioner",
+        cameraCount: "Visar {{count}} kameror",
+        legend: "Kameraposition",
+        showList: "Visa kameralista ({{count}})",
       },
       rateLimit: {
         banner: "API hastighetsbegränsad. Försöker igen om {{time}}",

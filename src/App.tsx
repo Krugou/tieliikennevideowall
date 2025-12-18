@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import CameraTile from "./components/CameraTile";
 import CitySelector from "./components/CitySelector";
 import Modal from "./components/Modal";
+import MapModal from "./components/MapModal";
 import {
   fetchStations,
   defaultCities,
@@ -93,6 +94,7 @@ const App: React.FC = () => {
 
   const [settingsOpen, setSettingsOpen] = useState<boolean>(shouldOnboard);
   const [isOnboarding, setIsOnboarding] = useState<boolean>(shouldOnboard);
+  const [mapOpen, setMapOpen] = useState<boolean>(false);
 
   // Persist user preference once onboarding is complete.
   useEffect(() => {
@@ -330,6 +332,28 @@ const App: React.FC = () => {
             <div className="flex items-center gap-2 ml-auto">
               <button
                 type="button"
+                title={t("app.showMap")}
+                aria-label={t("app.showMap")}
+                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10 inline-flex items-center gap-2"
+                onClick={() => setMapOpen(true)}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  className="opacity-90"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"
+                  />
+                </svg>
+                <span className="hidden sm:inline">{t("app.map")}</span>
+              </button>
+
+              <button
+                type="button"
                 title={t("app.settings")}
                 aria-label={t("settings.open")}
                 className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10 inline-flex items-center gap-2"
@@ -479,6 +503,17 @@ const App: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      <MapModal
+        isOpen={mapOpen}
+        onClose={() => setMapOpen(false)}
+        cameras={items.map((it) => ({
+          id: it.cam.id,
+          name: it.cam.properties?.name || `Camera ${it.cam.id}`,
+          coordinates: it.cam.geometry?.coordinates || [],
+          municipality: it.cam.properties?.municipality,
+        }))}
+      />
 
       <Modal
         isOpen={settingsOpen}
