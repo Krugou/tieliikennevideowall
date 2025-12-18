@@ -122,7 +122,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
                 fontSize="12"
                 className="select-none"
               >
-                Camera location
+                {t("map.legend")}
               </text>
             </g>
           </svg>
@@ -132,7 +132,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
         <div className="mt-4 max-h-48 overflow-y-auto">
           <details className="text-sm">
             <summary className="cursor-pointer text-neutral-400 hover:text-neutral-300">
-              Show camera list ({cameras.length})
+              {t("map.showList", { count: cameras.length })}
             </summary>
             <ul className="mt-2 space-y-1">
               {cameras.map((camera) => (

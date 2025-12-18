@@ -77,6 +77,8 @@ const resources = {
       map: {
         title: "Camera Locations",
         cameraCount: "Showing {{count}} cameras",
+        legend: "Camera location",
+        showList: "Show camera list ({{count}})",
       },
       rateLimit: {
         banner: "API rate-limited. Retrying in {{time}}",
@@ -130,6 +132,8 @@ const resources = {
       map: {
         title: "Kamerasijainnit",
         cameraCount: "Näytetään {{count}} kameraa",
+        legend: "Kameran sijainti",
+        showList: "Näytä kameralista ({{count}})",
       },
       rateLimit: {
         banner:
@@ -184,6 +188,8 @@ const resources = {
       map: {
         title: "Kamerapositioner",
         cameraCount: "Visar {{count}} kameror",
+        legend: "Kameraposition",
+        showList: "Visa kameralista ({{count}})",
       },
       rateLimit: {
         banner: "API hastighetsbegränsad. Försöker igen om {{time}}",
