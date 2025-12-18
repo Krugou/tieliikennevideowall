@@ -17,6 +17,10 @@ type Props = {
   cameras: CameraLocation[];
 };
 
+// Configuration constants
+const ROUTE_BUFFER_DISTANCE_METERS = 5000; // 5km buffer for cameras along route
+const OSRM_ROUTING_SERVICE = "https://router.project-osrm.org/route/v1/driving";
+
 const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
   const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -163,7 +167,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
       const popupContent = `<strong>${camera.name}</strong>${
         camera.municipality ? `<br/>${camera.municipality}` : ""
-      }${isTarget ? "<br/><em>(Target)</em>" : ""}`;
+      }${isTarget ? `<br/><em>(${t("map.target")})</em>` : ""}`;
 
       marker.bindPopup(popupContent);
 
@@ -191,7 +195,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
       });
 
       const userMarker = L.marker(userLocation, { icon: userIcon }).addTo(map);
-      userMarker.bindPopup("<strong>Your Location</strong>");
+      userMarker.bindPopup(`<strong>${t("map.yourLocation")}</strong>`);
       userMarkerRef.current = userMarker;
     }
   }, [cameras, selectedTarget, routeCameras, userLocation]);
@@ -217,8 +221,13 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
     // Fetch route from OSRM (Open Source Routing Machine)
     const fetchRoute = async () => {
       try {
-        const url = `https://router.project-osrm.org/route/v1/driving/${userLocation[1]},${userLocation[0]};${targetLon},${targetLat}?overview=full&geometries=geojson`;
+        const url = `${OSRM_ROUTING_SERVICE}/${userLocation[1]},${userLocation[0]};${targetLon},${targetLat}?overview=full&geometries=geojson`;
         const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.code === "Ok" && data.routes && data.routes[0]) {
@@ -235,8 +244,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
           }).addTo(map);
           routeLayerRef.current = routeLine;
 
-          // Filter cameras along the route (within a certain distance)
-          const routeBuffer = 5000; // 5km buffer in meters
+          // Filter cameras along the route (within configured buffer distance)
           const camerasOnRoute = cameras.filter((camera) => {
             const [lon, lat] = camera.coordinates;
             if (
@@ -253,7 +261,10 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
             return coordinates.some((coord: L.LatLngExpression) => {
               const coordArray = coord as [number, number];
               const routePoint = L.latLng(coordArray[0], coordArray[1]);
-              return cameraLatLng.distanceTo(routePoint) <= routeBuffer;
+              return (
+                cameraLatLng.distanceTo(routePoint) <=
+                ROUTE_BUFFER_DISTANCE_METERS
+              );
             });
           });
 
@@ -261,9 +272,13 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
           // Fit map to show route
           map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+        } else {
+          console.warn("Route calculation failed:", data.code, data.message);
+          setRouteCameras([]);
         }
       } catch (error) {
         console.error("Failed to fetch route:", error);
+        setRouteCameras([]);
       } finally {
         setIsCalculatingRoute(false);
       }
@@ -370,7 +385,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
                       - {camera.municipality}
                     </span>
                   )}
-                  {selectedTarget?.id === camera.id && " (Target)"}
+                  {selectedTarget?.id === camera.id && ` (${t("map.target")})`}
                 </li>
               ))}
             </ul>

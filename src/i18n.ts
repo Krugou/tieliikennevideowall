@@ -88,6 +88,8 @@ const resources = {
         clearRoute: "Clear route",
         enableLocationForRoute:
           "Enable location access to show routes to cameras",
+        target: "Target",
+        yourLocation: "Your Location",
       },
       rateLimit: {
         banner: "API rate-limited. Retrying in {{time}}",
@@ -151,6 +153,8 @@ const resources = {
         clearRoute: "Tyhjennä reitti",
         enableLocationForRoute:
           "Salli sijaintilupa nähdäksesi reitit kameroille",
+        target: "Kohde",
+        yourLocation: "Sijaintisi",
       },
       rateLimit: {
         banner:
@@ -216,6 +220,8 @@ const resources = {
         clearRoute: "Rensa rutt",
         enableLocationForRoute:
           "Aktivera platsåtkomst för att visa rutter till kameror",
+        target: "Mål",
+        yourLocation: "Din plats",
       },
       rateLimit: {
         banner: "API hastighetsbegränsad. Försöker igen om {{time}}",
