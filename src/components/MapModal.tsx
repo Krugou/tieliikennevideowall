@@ -37,6 +37,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
   const [routeCameras, setRouteCameras] = useState<CameraLocation[]>([]);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const hasInitializedRef = useRef(false);
+  const hasCalculatedRouteRef = useRef(false);
 
   // Get user's location
   useEffect(() => {
@@ -270,8 +271,11 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
           setRouteCameras(camerasOnRoute);
 
-          // Fit map to show route
-          map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+          // Fit map to show route only on first calculation
+          if (!hasCalculatedRouteRef.current) {
+            map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+            hasCalculatedRouteRef.current = true;
+          }
         } else {
           console.warn("Route calculation failed:", data.code, data.message);
           setRouteCameras([]);
@@ -294,6 +298,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
       routeLayerRef.current.remove();
       routeLayerRef.current = null;
     }
+    hasCalculatedRouteRef.current = false;
   };
 
   const displayedCameras =
@@ -302,16 +307,26 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="w-full max-w-[900px] rounded-md bg-neutral-900 p-6">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold">{t("map.title")}</h2>
-          <p className="text-sm text-neutral-400 mt-1">
-            {selectedTarget && routeCameras.length > 0
-              ? t("map.routeCameraCount", {
-                  count: routeCameras.length,
-                  total: cameras.length,
-                })
-              : t("map.cameraCount", { count: cameras.length })}
-          </p>
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h2 className="text-xl font-semibold">{t("map.title")}</h2>
+            <p className="text-sm text-neutral-400 mt-1">
+              {selectedTarget && routeCameras.length > 0
+                ? t("map.routeCameraCount", {
+                    count: routeCameras.length,
+                    total: cameras.length,
+                  })
+                : t("map.cameraCount", { count: cameras.length })}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("modal.close")}
+            className="flex-none px-3 py-1.5 text-sm bg-neutral-800 hover:bg-neutral-700 rounded"
+          >
+            {t("modal.close")}
+          </button>
         </div>
 
         {/* Route controls */}
