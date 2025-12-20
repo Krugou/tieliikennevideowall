@@ -63,7 +63,7 @@ const getLocalCache = <T>(key: string) => {
     if (age > (parsed.ttl ?? DEFAULT_CACHE_TTL_MS)) {
       if (isDev)
         console.debug(
-          `[api/cache] expired: ${key} age=${age}ms ttl=${parsed.ttl}`
+          `[api/cache] expired: ${key} age=${age}ms ttl=${parsed.ttl}`,
         );
       localStorage.removeItem(`${CACHE_PREFIX}:${key}`);
       return null;
@@ -79,7 +79,7 @@ const getLocalCache = <T>(key: string) => {
 const setLocalCache = <T>(
   key: string,
   value: T,
-  ttl = DEFAULT_CACHE_TTL_MS
+  ttl = DEFAULT_CACHE_TTL_MS,
 ) => {
   try {
     const str = JSON.stringify({ ts: Date.now(), ttl, value });
@@ -115,7 +115,7 @@ const fetchWithSignal = async (url: string, opts: RequestInit = {}) => {
   if (!res.ok) {
     if (isDev)
       console.warn(
-        `[api/fetch] ${res.status} ${res.statusText} ${url} (${time}ms)`
+        `[api/fetch] ${res.status} ${res.statusText} ${url} (${time}ms)`,
       );
     if (res.status === 429) throw new ApiError("Rate limited", 429);
     throw new ApiError(`HTTP ${res.status}`, res.status);
@@ -168,7 +168,7 @@ export const fetchYrWeatherForCamera = async (args: {
 
   const p = (async () => {
     const url = `${YR_BASE}?lat=${encodeURIComponent(
-      String(lat)
+      String(lat),
     )}&lon=${encodeURIComponent(String(lon))}`;
     const res = await fetch(url, {
       signal,
@@ -290,11 +290,11 @@ export const fetchWeatherForCamera = async (args: {
 const promisePool = async <T, R>(
   items: T[],
   worker: (i: T) => Promise<R>,
-  concurrency = 6
+  concurrency = 6,
 ) => {
   if (isDev)
     console.debug(
-      `[api/pool] start workers=${concurrency} items=${items.length}`
+      `[api/pool] start workers=${concurrency} items=${items.length}`,
     );
   const out: R[] = [];
   let i = 0;
@@ -302,7 +302,7 @@ const promisePool = async <T, R>(
     while (i < items.length) {
       const idx = i++;
       if (isDev) console.debug(`[api/pool] worker start item=${idx}`);
-      // eslint-disable-next-line no-await-in-loop
+
       out[idx] = await worker(items[idx]!);
       if (isDev) console.debug(`[api/pool] worker done item=${idx}`);
     }
@@ -334,7 +334,7 @@ const fetchLatestHistory = async (stationId: string, signal?: AbortSignal) => {
       return { latestModified: null };
     }
     const data = await safeJson<{ presets?: { history?: HistoryEntry[] }[] }>(
-      res
+      res,
     );
     const history = data?.presets?.[0]?.history || [];
     if (history.length === 0) {
@@ -344,11 +344,11 @@ const fetchLatestHistory = async (stationId: string, signal?: AbortSignal) => {
     }
 
     const latest = history.reduce((prev, curr) =>
-      new Date(curr.lastModified) > new Date(prev.lastModified) ? curr : prev
+      new Date(curr.lastModified) > new Date(prev.lastModified) ? curr : prev,
     );
     if (isDev)
       console.debug(
-        `[api/history] ${stationId} latest=${latest.lastModified} (${elapsed}ms)`
+        `[api/history] ${stationId} latest=${latest.lastModified} (${elapsed}ms)`,
       );
     return { latestModified: latest.lastModified as string };
   } catch (err) {
@@ -404,7 +404,7 @@ export const fetchStations = async (
     refreshTick?: number; // used to bust the local cache between forced refreshes
     concurrency?: number;
     cacheTtlMs?: number;
-  }
+  },
 ) => {
   const start = Date.now();
   const { signal, refreshTick = 0, concurrency = 6, cacheTtlMs } = opts ?? {};
@@ -412,7 +412,7 @@ export const fetchStations = async (
     console.info(
       `[api/stations] start (cities=${
         cityOrCities ?? "all"
-      }) tick=${refreshTick}`
+      }) tick=${refreshTick}`,
     );
 
   const cities =
@@ -422,8 +422,8 @@ export const fetchStations = async (
           .map((s) => s.trim().toLowerCase())
           .filter(Boolean)
       : Array.isArray(cityOrCities)
-      ? cityOrCities.map((s) => s.trim().toLowerCase()).filter(Boolean)
-      : [];
+        ? cityOrCities.map((s) => s.trim().toLowerCase()).filter(Boolean)
+        : [];
 
   // cache key takes into account selected cities and refresh tick
   const cacheKey = `stations:${cities.join(",") || "all"}:tick:${refreshTick}`;
@@ -431,7 +431,7 @@ export const fetchStations = async (
   if (cached) {
     if (isDev)
       console.info(
-        `[api/stations] cache hit key=${cacheKey} items=${cached.length}`
+        `[api/stations] cache hit key=${cacheKey} items=${cached.length}`,
       );
     return cached;
   }
@@ -448,8 +448,8 @@ export const fetchStations = async (
           cities.some(
             (city) =>
               cam.properties.municipality?.toLowerCase().includes(city) ||
-              cam.properties.name.toLowerCase().includes(city)
-          )
+              cam.properties.name.toLowerCase().includes(city),
+          ),
         )
       : features;
     if (isDev) console.info(`[api/stations] filtered=${filtered.length}`);
@@ -468,13 +468,13 @@ export const fetchStations = async (
         try {
           if (isDev)
             console.debug(
-              `[api/stations] fetching details for ${cam.id} "${cam.properties.name}"`
+              `[api/stations] fetching details for ${cam.id} "${cam.properties.name}"`,
             );
           const detailsRes = await fetchWithSignal(
             `${API_BASE}/stations/${cam.id}`,
             {
               signal,
-            }
+            },
           );
           const details = await safeJson<StationDetail>(detailsRes);
 
@@ -494,7 +494,7 @@ export const fetchStations = async (
             console.debug(
               `[api/stations] ${cam.id} details=${
                 details ? "ok" : "null"
-              } imageUrl=${!!imageUrl} latestModified=${latestModified}`
+              } imageUrl=${!!imageUrl} latestModified=${latestModified}`,
             );
 
           detailsSuccess += 1;
@@ -506,7 +506,7 @@ export const fetchStations = async (
               console.error(
                 `[api/stations] ${cam.id} ApiError`,
                 err.status,
-                err.message
+                err.message,
               );
             throw err;
           }
@@ -519,13 +519,13 @@ export const fetchStations = async (
           };
         }
       },
-      concurrency
+      concurrency,
     );
 
     const elapsed = Date.now() - start;
     if (isDev) {
       console.info(
-        `[api/stations] completed features=${features.length} filtered=${filtered.length} detailsSuccess=${detailsSuccess} detailsFail=${detailsFail} historySuccess=${historySuccess} historyFail=${historyFail} elapsed=${elapsed}ms`
+        `[api/stations] completed features=${features.length} filtered=${filtered.length} detailsSuccess=${detailsSuccess} detailsFail=${detailsFail} historySuccess=${historySuccess} historyFail=${historyFail} elapsed=${elapsed}ms`,
       );
     }
 

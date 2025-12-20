@@ -29,10 +29,10 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
   const routeLayerRef = useRef<L.Polyline | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
-    null
+    null,
   );
   const [selectedTarget, setSelectedTarget] = useState<CameraLocation | null>(
-    null
+    null,
   );
   const [routeCameras, setRouteCameras] = useState<CameraLocation[]>([]);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
@@ -53,7 +53,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
         },
         (error) => {
           console.warn("Could not get user location:", error);
-        }
+        },
       );
     }
   }, [isOpen]);
@@ -199,7 +199,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
       userMarker.bindPopup(`<strong>${t("map.yourLocation")}</strong>`);
       userMarkerRef.current = userMarker;
     }
-  }, [cameras, selectedTarget, routeCameras, userLocation]);
+  }, [cameras, selectedTarget, routeCameras, userLocation, t]);
 
   // Calculate route when target is selected
   useEffect(() => {
@@ -234,7 +234,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
         if (data.code === "Ok" && data.routes && data.routes[0]) {
           const route = data.routes[0];
           const coordinates = route.geometry.coordinates.map(
-            (coord: number[]) => [coord[1], coord[0]] as L.LatLngExpression
+            (coord: number[]) => [coord[1], coord[0]] as L.LatLngExpression,
           );
 
           // Draw route on map

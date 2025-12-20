@@ -13,7 +13,7 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
 
   const normalizedSelectedCities = useMemo(
     () => selectedCities.map((s) => s.toLowerCase()),
-    [selectedCities]
+    [selectedCities],
   );
 
   const availableCities = useMemo(() => {
@@ -31,7 +31,7 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
       onChange(arr);
       setInput(arr.join(", "));
     },
-    [onChange, selectedCities]
+    [onChange, selectedCities],
   );
 
   const applyInput = useCallback(
@@ -44,14 +44,14 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
       onChange(arr);
       setInput(arr.join(", "));
     },
-    [onChange]
+    [onChange],
   );
 
   const [showAllCities, setShowAllCities] = useState(false);
 
   const citiesToShow = showAllCities ? availableCities : defaults;
 
-  const buttons = useMemo<React.ReactElement[]>(
+  const buttons = useMemo(
     () =>
       citiesToShow.map((c) => {
         const active = selectedCities.some((s) => s.toLowerCase() === c);
@@ -60,7 +60,7 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
             key={c}
             aria-pressed={active}
             onClick={() => toggleCity(c)}
-            className={`px-2 py-1 text-xs rounded ${
+            className={`px-2 py-1 text-xs rounded min-w-[64px] ${
               active ? "bg-blue-600 text-white" : "bg-neutral-800 text-white/80"
             }`}
             title={t("city.toggleTitle", { city: c })}
@@ -69,17 +69,13 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
           </button>
         );
       }),
-    [citiesToShow, selectedCities, t, toggleCity]
+    [citiesToShow, selectedCities, t, toggleCity],
   );
 
   return (
     <div className="flex items-center gap-2 w-full">
       <div className="city-selector flex gap-1 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1">
-        {buttons.map((btn) =>
-          React.cloneElement(btn, {
-            className: `${btn.props.className} px-2 py-1 text-xs min-w-[64px]`,
-          })
-        )}
+        {buttons}
         <button
           onClick={() => setShowAllCities(!showAllCities)}
           className="px-2 py-1 text-xs rounded bg-neutral-700 text-white/80 hover:bg-neutral-600 min-w-[64px]"

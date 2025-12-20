@@ -1,7 +1,10 @@
-name: Deploy to GitHub Pages
+name: Deploy with Checks to GitHub Pages
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -10,6 +13,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  pull-requests: write
 
 concurrency:
   group: deploy-pages-${{ github.ref }}
@@ -19,22 +23,141 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js 22
+      - name: 🔧 Use Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: 🔍 Type Check
+        id: typecheck
+        run: |
+          echo "status=running" >> $GITHUB_OUTPUT
+          START_TIME=$(date +%s%3N)
+          if npm run type-check; then
+            echo "status=✅ success" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ failed" >> $GITHUB_OUTPUT
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
+          END_TIME=$(date +%s%3N)
+          DURATION=$((END_TIME - START_TIME))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+        continue-on-error: true
 
-      - name: Validate build artifact exists
+      - name: 🧪 Run Tests
+        id: test
+        run: |
+          echo "status=running" >> $GITHUB_OUTPUT
+          START_TIME=$(date +%s%3N)
+          TEST_OUTPUT=$(npm run test:run 2>&1 || true)
+          if echo "$TEST_OUTPUT" | grep -q "Test Files.*passed"; then
+            echo "status=✅ success" >> $GITHUB_OUTPUT
+            PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed \(\d+\))' | tail -1 || echo "0")
+            FAILED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
+            echo "passed=$PASSED" >> $GITHUB_OUTPUT
+            echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ failed" >> $GITHUB_OUTPUT
+            echo "failed=true" >> $GITHUB_OUTPUT
+            echo "passed=0" >> $GITHUB_OUTPUT
+            echo "failed=unknown" >> $GITHUB_OUTPUT
+          fi
+          END_TIME=$(date +%s%3N)
+          DURATION=$((END_TIME - START_TIME))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: 🔎 Lint Check
+        id: lint
+        run: |
+          echo "status=running" >> $GITHUB_OUTPUT
+          START_TIME=$(date +%s%3N)
+          if npm run lint:ci; then
+            echo "status=✅ success" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ failed" >> $GITHUB_OUTPUT
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
+          END_TIME=$(date +%s%3N)
+          DURATION=$((END_TIME - START_TIME))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: 🏗️ Build Application
+        id: build
+        run: |
+          echo "status=running" >> $GITHUB_OUTPUT
+          START_TIME=$(date +%s%3N)
+          if npm run build; then
+            echo "status=✅ success" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ failed" >> $GITHUB_OUTPUT
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
+          END_TIME=$(date +%s%3N)
+          DURATION=$((END_TIME - START_TIME))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: 📊 Generate Deployment Summary
+        if: always()
+        run: |
+          echo "# 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📋 Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Type Check | ${{ steps.typecheck.outputs.status || '⏭️ skipped' }} | ${{ steps.typecheck.outputs.duration || '-' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 Tests | ${{ steps.test.outputs.status || '⏭️ skipped' }} | ${{ steps.test.outputs.duration || '-' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔎 Lint | ${{ steps.lint.outputs.status || '⏭️ skipped' }} | ${{ steps.lint.outputs.duration || '-' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏗️ Build | ${{ steps.build.outputs.status || '⏭️ skipped' }} | ${{ steps.build.outputs.duration || '-' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.test.outputs.passed }}" != "" ]; then
+            echo "### 🧪 Test Details" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tests Passed:** ${{ steps.test.outputs.passed }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tests Failed:** ${{ steps.test.outputs.failed || '0' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Check if any step failed
+          if [ "${{ steps.typecheck.outputs.failed }}" == "true" ] || [ "${{ steps.test.outputs.failed }}" == "true" ] || [ "${{ steps.lint.outputs.failed }}" == "true" ] || [ "${{ steps.build.outputs.failed }}" == "true" ]; then
+            echo "## ❌ Status: DEPLOYMENT BLOCKED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ One or more checks failed. Please fix the issues before deploying." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed Checks:" >> $GITHUB_STEP_SUMMARY
+            [ "${{ steps.typecheck.outputs.failed }}" == "true" ] && echo "- ❌ Type Check" >> $GITHUB_STEP_SUMMARY
+            [ "${{ steps.test.outputs.failed }}" == "true" ] && echo "- ❌ Tests" >> $GITHUB_STEP_SUMMARY
+            [ "${{ steps.lint.outputs.failed }}" == "true" ] && echo "- ❌ Lint" >> $GITHUB_STEP_SUMMARY
+            [ "${{ steps.build.outputs.failed }}" == "true" ] && echo "- ❌ Build" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ✅ Status: READY TO DEPLOY" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 All checks passed successfully! The application is ready for deployment." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: ❌ Stop deployment if checks failed
+        if: steps.typecheck.outputs.failed == 'true' || steps.test.outputs.failed == 'true' || steps.lint.outputs.failed == 'true' || steps.build.outputs.failed == 'true'
+        run: |
+          echo "Deployment blocked due to failed checks"
+          exit 1
+
+      - name: ✅ Validate build artifact exists
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           echo "Validating ./dist exists..."
           if [ ! -d "./dist" ]; then
@@ -44,13 +167,16 @@ jobs:
           echo "Contents of ./dist:"
           ls -la ./dist || true
 
-      - name: Upload build artifact (for debug)
+      - name: 📤 Upload build artifact (for debug)
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: ./dist
+          retention-days: 7
 
-      - name: Check if GitHub Pages is enabled
+      - name: 🔒 Check if GitHub Pages is enabled
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           REPO_API: https://api.github.com/repos/${{ github.repository }}/pages
         run: |
@@ -61,13 +187,55 @@ jobs:
             exit 1
           fi
 
-      - name: Configure GitHub Pages
+      - name: ⚙️ Configure GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/configure-pages@v3
 
-      - name: Upload artifact for deployment
+      - name: 📦 Upload artifact for deployment
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-pages-artifact@v4
         with:
           path: './dist'
 
-      - name: Deploy to GitHub Pages
+      - name: 🚀 Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: 💬 Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const typecheck = '${{ steps.typecheck.outputs.status }}' || '⏭️ skipped';
+            const test = '${{ steps.test.outputs.status }}' || '⏭️ skipped';
+            const lint = '${{ steps.lint.outputs.status }}' || '⏭️ skipped';
+            const build = '${{ steps.build.outputs.status }}' || '⏭️ skipped';
+
+            const passed = '${{ steps.test.outputs.passed }}' || '0';
+            const failed = '${{ steps.test.outputs.failed }}' || '0';
+
+            const allPassed = typecheck.includes('✅') && test.includes('✅') && lint.includes('✅') && build.includes('✅');
+
+            const body = `## 🚀 Deployment Check Results
+
+            | Check | Status | Duration |
+            |-------|--------|----------|
+            | 🔍 Type Check | ${typecheck} | ${{ steps.typecheck.outputs.duration || '-' }} |
+            | 🧪 Tests | ${test} | ${{ steps.test.outputs.duration || '-' }} |
+            | 🔎 Lint | ${lint} | ${{ steps.lint.outputs.duration || '-' }} |
+            | 🏗️ Build | ${build} | ${{ steps.build.outputs.duration || '-' }} |
+
+            ### Test Results
+            - ✅ Tests Passed: ${passed}
+            - ❌ Tests Failed: ${failed}
+
+            ${allPassed ? '✅ **All checks passed!** This PR is ready to merge.' : '❌ **Some checks failed.** Please review and fix the issues before merging.'}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
