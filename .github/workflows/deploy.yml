@@ -40,11 +40,13 @@ jobs:
         run: |
           echo "status=running" >> $GITHUB_OUTPUT
           START_TIME=$(date +%s%3N)
-          if npm run type-check; then
+          if npm run type-check 2>&1 | tee typecheck.log; then
             echo "status=✅ success" >> $GITHUB_OUTPUT
+            echo "failed=false" >> $GITHUB_OUTPUT
           else
             echo "status=❌ failed" >> $GITHUB_OUTPUT
             echo "failed=true" >> $GITHUB_OUTPUT
+            cat typecheck.log
           fi
           END_TIME=$(date +%s%3N)
           DURATION=$((END_TIME - START_TIME))
@@ -56,10 +58,11 @@ jobs:
         run: |
           echo "status=running" >> $GITHUB_OUTPUT
           START_TIME=$(date +%s%3N)
-          TEST_OUTPUT=$(npm run test:run 2>&1 || true)
-          if echo "$TEST_OUTPUT" | grep -q "Test Files.*passed"; then
+          if npm run test:run 2>&1 | tee test.log; then
             echo "status=✅ success" >> $GITHUB_OUTPUT
-            PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed \(\d+\))' | tail -1 || echo "0")
+            echo "failed=false" >> $GITHUB_OUTPUT
+            TEST_OUTPUT=$(cat test.log)
+            PASSED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= passed)' | tail -1 || echo "0")
             FAILED=$(echo "$TEST_OUTPUT" | grep -oP '\d+(?= failed)' | head -1 || echo "0")
             echo "passed=$PASSED" >> $GITHUB_OUTPUT
             echo "failed=$FAILED" >> $GITHUB_OUTPUT
@@ -67,7 +70,7 @@ jobs:
             echo "status=❌ failed" >> $GITHUB_OUTPUT
             echo "failed=true" >> $GITHUB_OUTPUT
             echo "passed=0" >> $GITHUB_OUTPUT
-            echo "failed=unknown" >> $GITHUB_OUTPUT
+            cat test.log
           fi
           END_TIME=$(date +%s%3N)
           DURATION=$((END_TIME - START_TIME))
@@ -79,11 +82,13 @@ jobs:
         run: |
           echo "status=running" >> $GITHUB_OUTPUT
           START_TIME=$(date +%s%3N)
-          if npm run lint:ci; then
+          if npm run lint:ci 2>&1 | tee lint.log; then
             echo "status=✅ success" >> $GITHUB_OUTPUT
+            echo "failed=false" >> $GITHUB_OUTPUT
           else
             echo "status=❌ failed" >> $GITHUB_OUTPUT
             echo "failed=true" >> $GITHUB_OUTPUT
+            cat lint.log
           fi
           END_TIME=$(date +%s%3N)
           DURATION=$((END_TIME - START_TIME))
@@ -95,11 +100,13 @@ jobs:
         run: |
           echo "status=running" >> $GITHUB_OUTPUT
           START_TIME=$(date +%s%3N)
-          if npm run build; then
+          if npm run build 2>&1 | tee build.log; then
             echo "status=✅ success" >> $GITHUB_OUTPUT
+            echo "failed=false" >> $GITHUB_OUTPUT
           else
             echo "status=❌ failed" >> $GITHUB_OUTPUT
             echo "failed=true" >> $GITHUB_OUTPUT
+            cat build.log
           fi
           END_TIME=$(date +%s%3N)
           DURATION=$((END_TIME - START_TIME))
