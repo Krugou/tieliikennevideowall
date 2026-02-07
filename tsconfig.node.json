@@ -2,14 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "noEmit": true
   },
-  "include": [
-    "vite.config.ts",
-    "scripts/**/*",
-    ".eslintrc.cjs"
-  ]
+  "include": ["vite.config.ts", "scripts/**/*", ".eslintrc.cjs"]
 }

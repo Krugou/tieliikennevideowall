@@ -58,7 +58,7 @@ const App: React.FC = () => {
   const initialCities =
     queryCities.trim().length > 0
       ? parseCitiesCsv(queryCities)
-      : storedCities ?? defaultCities;
+      : (storedCities ?? defaultCities);
 
   const shouldOnboard =
     queryCities.trim().length === 0 &&
@@ -110,7 +110,7 @@ const App: React.FC = () => {
   // new: state for forced 30 minute refresh
   const [refreshTick, setRefreshTick] = useState(0);
   const [nextForceRefreshAt, setNextForceRefreshAt] = useState<number | null>(
-    null
+    null,
   );
 
   const [selectedItem, setSelectedItem] = useState<StationItem | null>(null);
@@ -148,7 +148,7 @@ const App: React.FC = () => {
         rateLimitAttemptsRef.current += 1;
         const backoffMs = Math.min(
           10 * 60 * 1000,
-          60000 * 2 ** (rateLimitAttemptsRef.current - 1)
+          60000 * 2 ** (rateLimitAttemptsRef.current - 1),
         );
         setRateLimited(true);
         setRetryAt(Date.now() + backoffMs);
@@ -303,38 +303,50 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="h-full w-full flex flex-col bg-gradient-to-b from-neutral-900 via-neutral-950 to-black text-white">
+    <div className="h-full w-full flex flex-col bg-neo-offwhite text-black font-mono">
       {showMenu && (
-        <header className="p-3 bg-transparent flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
-            <h1 className="text-lg font-semibold">{t("app.title")}</h1>
-            <div className="text-xs opacity-80 md:ml-2">
-              {new Date(now).toLocaleString(locale)}
-            </div>
-            <div className="ml-0 sm:ml-2 text-xs bg-white/5 px-2 py-1 rounded">
-              {t("app.cameras", { count: cameraCount })}
-            </div>
-            {nextRefreshRemaining !== null && (
-              <div className="ml-2 text-xs bg-blue-600/10 px-2 py-1 rounded text-blue-200">
-                {t("app.nextReload", { time: formatMs(nextRefreshRemaining) })}
+        <header className="p-4 bg-neo-yellow border-b-4 border-black shadow-neo z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative">
+          {/* Top Row: Title + Stats */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
+            <h1 className="text-xl sm:text-2xl font-sans font-black tracking-tighter uppercase transform -rotate-1 bg-black text-white px-2 py-1 shadow-neo-sm self-start sm:self-auto break-words max-w-full">
+              {t("app.title")}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-col">
+                <div className="text-xs font-bold font-mono border-2 border-black bg-white px-1 shadow-neo-sm">
+                  {new Date(now).toLocaleString(locale)}
+                </div>
               </div>
-            )}
+
+              <div className="text-xs font-bold bg-neo-pink text-white border-2 border-black px-2 py-1 shadow-neo-sm">
+                {t("app.cameras", { count: cameraCount })}
+              </div>
+              {nextRefreshRemaining !== null && (
+                <div className="text-xs font-bold bg-neo-blue text-white border-2 border-black px-2 py-1 shadow-neo-sm animate-pulse">
+                  {t("app.nextReload", {
+                    time: formatMs(nextRefreshRemaining),
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="w-full sm:w-auto flex items-center gap-2 justify-between">
-            <div className="flex-1 sm:flex-none">
+          {/* Bottom Row: Controls + City Selector */}
+          <div className="w-full lg:w-auto flex flex-col md:flex-row items-start md:items-center gap-4 justify-between lg:justify-end">
+            <div className="w-full md:w-auto">
               <CitySelector
                 selectedCities={selectedCities}
                 onChange={(c) => setSelectedCities(c)}
               />
             </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto lg:justify-end">
               <button
                 type="button"
                 title={t("app.showMap")}
                 aria-label={t("app.showMap")}
-                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10 inline-flex items-center gap-2"
+                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all inline-flex items-center gap-2"
                 onClick={() => setMapOpen(true)}
               >
                 <svg
@@ -342,29 +354,30 @@ const App: React.FC = () => {
                   width="16"
                   height="16"
                   aria-hidden="true"
-                  className="opacity-90"
+                  className="opacity-100"
                 >
                   <path
                     fill="currentColor"
                     d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"
                   />
                 </svg>
-                <span className="hidden sm:inline">{t("app.map")}</span>
+                <span className="uppercase">{t("app.map")}</span>
               </button>
 
               <button
                 type="button"
                 title={t("app.settings")}
                 aria-label={t("settings.open")}
-                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10 inline-flex items-center gap-2"
+                data-testid="settings-button"
+                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all inline-flex items-center gap-2"
                 onClick={() => setSettingsOpen(true)}
               >
                 {SettingsIcon}
-                <span className="hidden sm:inline">{t("app.settings")}</span>
+                <span className="uppercase">{t("app.settings")}</span>
               </button>
 
               <select
-                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
+                className="flex-1 sm:flex-none px-2 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm focus:outline-none cursor-pointer min-w-[50px]"
                 value={i18n.language}
                 aria-label="Language"
                 onChange={(e) => {
@@ -376,19 +389,20 @@ const App: React.FC = () => {
                 <option value="en">EN</option>
               </select>
 
-              <label className="inline-flex items-center gap-2 text-xs">
+              <label className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 text-xs font-bold bg-white border-2 border-black px-2 py-1 shadow-neo-sm cursor-pointer hover:bg-neo-offwhite">
                 <input
                   type="checkbox"
                   checked={showLabels}
                   onChange={(e) => setShowLabels(e.target.checked)}
+                  className="accent-black w-4 h-4"
                 />
-                <span className="hidden sm:inline">{t("app.showLabels")}</span>
+                <span className="uppercase">{t("app.showLabels")}</span>
               </label>
 
               <button
                 title={t("app.refreshNow")}
                 aria-label={t("app.refreshNow")}
-                className="px-2 py-1 rounded bg-white/5 text-xs hover:bg-white/10"
+                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-neo-green border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all uppercase"
                 onClick={manualRefresh}
                 disabled={loading}
               >
@@ -400,8 +414,8 @@ const App: React.FC = () => {
       )}
 
       {rateLimited && (
-        <div className="m-2 p-2 bg-yellow-600/20 border border-yellow-500 text-yellow-100 text-sm rounded flex items-center justify-between">
-          <div>
+        <div className="m-4 p-4 bg-neo-pink border-4 border-black shadow-neo flex items-center justify-between animate-shake">
+          <div className="font-bold text-white uppercase text-lg">
             {t("rateLimit.banner", {
               time: retryAt
                 ? formatMs(Math.max(0, retryAt - Date.now()))
@@ -411,10 +425,9 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                rateLimitAttemptsRef.current = 0;
                 manualRefresh();
               }}
-              className="text-xs bg-white/10 px-2 py-1 rounded hover:bg-white/20"
+              className="text-sm font-bold bg-black text-white px-4 py-2 border-2 border-white hover:bg-neutral-800 shadow-neo-sm"
             >
               {t("rateLimit.retryNow")}
             </button>
@@ -422,13 +435,13 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <main className="flex-1 overflow-auto p-2">
+      <main className="flex-1 overflow-auto p-4 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]">
         {!showMenu && (
           <button
             type="button"
             title={t("app.settings")}
             aria-label={t("settings.open")}
-            className="fixed bottom-4 right-4 z-40 rounded-full bg-white/10 hover:bg-white/20 p-3 backdrop-blur"
+            className="fixed bottom-6 right-6 z-40 bg-neo-yellow border-4 border-black p-4 shadow-neo hover:shadow-neo-xl hover:scale-110 transition-transform"
             onClick={() => setSettingsOpen(true)}
           >
             {SettingsIcon}
@@ -436,8 +449,10 @@ const App: React.FC = () => {
         )}
 
         {loading && (
-          <div className="p-2 text-neutral-300 text-sm">
-            {t("app.loadingCameras")}
+          <div className="p-8 text-center">
+            <div className="inline-block text-2xl font-black bg-neo-blue text-white px-6 py-4 border-4 border-black shadow-neo animate-bounce">
+              {t("app.loadingCameras")}
+            </div>
           </div>
         )}
 
@@ -493,7 +508,7 @@ const App: React.FC = () => {
                   <div className="opacity-70 text-xs">
                     {t("modal.lastUpdated", {
                       time: new Date(
-                        selectedItem.latestModified
+                        selectedItem.latestModified,
                       ).toLocaleString(locale),
                     })}
                   </div>

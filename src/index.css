@@ -1,9 +1,66 @@
 @import "tailwindcss";
 
+/* Google Fonts Import */
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;700;900&display=swap");
+
 html,
 body,
 #root {
   height: 100%;
+  background-color: #f0f0f0; /* Soft gray to make white/colors pop */
+  color: #000000;
+  font-family: "Public Sans", sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll from brutal shadows/transforms */
+}
+
+/* Brutalist Scrollbar */
+::-webkit-scrollbar {
+  width: 16px;
+  background: #000000;
+  border-left: 2px solid #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffde00; /* Neo Yellow */
+  border: 2px solid #000000;
+  box-shadow: inset 2px 2px 0px 0px #ffffff;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-left: 2px solid #000;
+  background-image:
+    radial-gradient(#000 15%, transparent 16%),
+    radial-gradient(#000 15%, transparent 16%);
+  background-size: 8px 8px;
+  background-position:
+    0 0,
+    4px 4px;
+}
+
+/* Default Selection */
+::selection {
+  background-color: #ff0099; /* Neo Pink */
+  color: #ffffff;
+}
+
+/* Base Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}
+
+/* Code / Monospace overrides */
+code,
+pre,
+.mono {
+  font-family: "Courier Prime", monospace;
 }
 
 /* Mobile spacing and small-screen UI adjustments */

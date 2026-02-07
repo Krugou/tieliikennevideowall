@@ -1,0 +1,275 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+    - banner [ref=e4]:
+        - generic [ref=e5]:
+            - heading "Traffic Camera Video Wall" [level=1] [ref=e6]
+            - generic [ref=e7]:
+                - generic [ref=e9]: 07/02/2026, 11:05:41
+                - generic [ref=e10]: 36 cameras
+                - generic [ref=e11]: "Next reload: 29:58"
+        - generic [ref=e12]:
+            - generic [ref=e14]:
+                - generic [ref=e15]:
+                    - button "vantaa" [pressed] [ref=e16]
+                    - button "espoo" [pressed] [ref=e17]
+                    - button "helsinki" [pressed] [ref=e18]
+                    - button "+ More" [ref=e19]
+                - textbox "Add cities" [ref=e20]:
+                    - /placeholder: Add cities (comma separated)
+                    - text: vantaa, espoo, helsinki
+            - generic [ref=e21]:
+                - button "Show camera locations on map" [ref=e22]:
+                    - img [ref=e23]
+                    - generic [ref=e25]: Map
+                - button "Open settings" [ref=e26]:
+                    - img [ref=e27]
+                    - generic [ref=e29]: Settings
+                - combobox "Language" [ref=e30] [cursor=pointer]:
+                    - option "FI"
+                    - option "SV"
+                    - option "EN" [selected]
+                - generic [ref=e31] [cursor=pointer]:
+                    - checkbox "Show labels" [checked] [ref=e32]
+                    - generic [ref=e33]: Show labels
+                - button "Refresh now" [ref=e34]: Refresh
+    - main [ref=e35]:
+        - generic [ref=e36]:
+            - button "st101_Helsinki_Pakila" [ref=e37] [cursor=pointer]:
+                - img "st101_Helsinki_Pakila" [ref=e39]
+                - generic [ref=e40]:
+                    - generic [ref=e42]: st101_Helsinki_Pakila
+                    - generic [ref=e45]: 15:32
+            - button "vt4_Helsinki_Tattarisuo" [ref=e46] [cursor=pointer]:
+                - generic [ref=e48]: LIVE
+                - img "vt4_Helsinki_Tattarisuo" [ref=e50]
+                - generic [ref=e51]:
+                    - generic [ref=e53]: vt4_Helsinki_Tattarisuo
+                    - generic [ref=e56]: 10:56
+            - button "vt1_Espoo_Kehä_III" [ref=e57] [cursor=pointer]:
+                - generic [ref=e59]: LIVE
+                - img "vt1_Espoo_Kehä_III" [ref=e61]
+                - generic [ref=e62]:
+                    - generic [ref=e64]: vt1_Espoo_Kehä_III
+                    - generic [ref=e67]: 10:59
+            - button "vt1_Espoo_Hista" [ref=e68] [cursor=pointer]:
+                - generic [ref=e70]: LIVE
+                - img "vt1_Espoo_Hista" [ref=e72]
+                - generic [ref=e73]:
+                    - generic [ref=e75]: vt1_Espoo_Hista
+                    - generic [ref=e78]: 10:57
+            - button "vt4_Vantaa_Leppäkorpi" [ref=e79] [cursor=pointer]:
+                - generic [ref=e81]: LIVE
+                - img "vt4_Vantaa_Leppäkorpi" [ref=e83]
+                - generic [ref=e84]:
+                    - generic [ref=e86]: vt4_Vantaa_Leppäkorpi
+                    - generic [ref=e89]: 11:05
+            - button "vt3_Vantaa_Klaukkala" [ref=e90] [cursor=pointer]:
+                - generic [ref=e92]: LIVE
+                - img "vt3_Vantaa_Klaukkala" [ref=e94]
+                - generic [ref=e95]:
+                    - generic [ref=e97]: vt3_Vantaa_Klaukkala
+                    - generic [ref=e100]: 11:00
+            - button "st101_Helsinki_Pirkkola" [ref=e101] [cursor=pointer]:
+                - generic [ref=e103]: LIVE
+                - img "st101_Helsinki_Pirkkola" [ref=e105]
+                - generic [ref=e106]:
+                    - generic [ref=e108]: st101_Helsinki_Pirkkola
+                    - generic [ref=e111]: 10:56
+            - button "kt50_Espoo_Koskelonsilta" [ref=e112] [cursor=pointer]:
+                - generic [ref=e114]: LIVE
+                - img "kt50_Espoo_Koskelonsilta" [ref=e116]
+                - generic [ref=e117]:
+                    - generic [ref=e119]: kt50_Espoo_Koskelonsilta
+                    - generic [ref=e122]: 10:58
+            - button "kt50_Vantaa_Tikkurila" [ref=e123] [cursor=pointer]:
+                - generic [ref=e125]: LIVE
+                - img "kt50_Vantaa_Tikkurila" [ref=e127]
+                - generic [ref=e128]:
+                    - generic [ref=e130]: kt50_Vantaa_Tikkurila
+                    - generic [ref=e133]: 10:56
+            - button "vt1_Espoo_Lommila2" [ref=e134] [cursor=pointer]:
+                - generic [ref=e136]: LIVE
+                - img "vt1_Espoo_Lommila2" [ref=e138]
+                - generic [ref=e139]:
+                    - generic [ref=e141]: vt1_Espoo_Lommila2
+                    - generic [ref=e144]: 10:56
+            - button "vt7_Helsinki_Landbo" [ref=e145] [cursor=pointer]:
+                - generic [ref=e147]: LIVE
+                - img "vt7_Helsinki_Landbo" [ref=e149]
+                - generic [ref=e150]:
+                    - generic [ref=e152]: vt7_Helsinki_Landbo
+                    - generic [ref=e155]: 10:55
+            - button "vt3_Vantaa_Keimola" [ref=e156] [cursor=pointer]:
+                - generic [ref=e158]: LIVE
+                - img "vt3_Vantaa_Keimola" [ref=e160]
+                - generic [ref=e161]:
+                    - generic [ref=e163]: vt3_Vantaa_Keimola
+                    - generic [ref=e166]: 11:04
+            - button "vt3_Vantaa_Kivistö_P" [ref=e167] [cursor=pointer]:
+                - generic [ref=e169]: LIVE
+                - img "vt3_Vantaa_Kivistö_P" [ref=e171]
+                - generic [ref=e172]:
+                    - generic [ref=e174]: vt3_Vantaa_Kivistö_P
+                    - generic [ref=e177]: 11:01
+            - button "vt3_Vantaa_Kivistö_E" [ref=e178] [cursor=pointer]:
+                - generic [ref=e180]: LIVE
+                - img "vt3_Vantaa_Kivistö_E" [ref=e182]
+                - generic [ref=e183]:
+                    - generic [ref=e185]: vt3_Vantaa_Kivistö_E
+                    - generic [ref=e188]: 11:02
+            - button "kt51_Espoo_Matinkylä" [ref=e189] [cursor=pointer]:
+                - generic [ref=e191]: LIVE
+                - img "kt51_Espoo_Matinkylä" [ref=e193]
+                - generic [ref=e194]:
+                    - generic [ref=e196]: kt51_Espoo_Matinkylä
+                    - generic [ref=e199]: 10:57
+            - button "kt51_Espoo_Finnoo" [ref=e200] [cursor=pointer]:
+                - generic [ref=e202]: LIVE
+                - img "kt51_Espoo_Finnoo" [ref=e204]
+                - generic [ref=e205]:
+                    - generic [ref=e207]: kt51_Espoo_Finnoo
+                    - generic [ref=e210]: 10:56
+            - button "Kt51_Espoo_Kivenlahti" [ref=e211] [cursor=pointer]:
+                - generic [ref=e213]: LIVE
+                - img "Kt51_Espoo_Kivenlahti" [ref=e215]
+                - generic [ref=e216]:
+                    - generic [ref=e218]: Kt51_Espoo_Kivenlahti
+                    - generic [ref=e221]: 11:03
+            - button "kt51_Helsinki_Ruoholahti" [ref=e222] [cursor=pointer]:
+                - generic [ref=e224]: LIVE
+                - img "kt51_Helsinki_Ruoholahti" [ref=e226]
+                - generic [ref=e227]:
+                    - generic [ref=e229]: kt51_Helsinki_Ruoholahti
+                    - generic [ref=e232]: 11:03
+            - button "kt51_Helsinki_Lauttasaari" [ref=e233] [cursor=pointer]:
+                - generic [ref=e235]: LIVE
+                - img "kt51_Helsinki_Lauttasaari" [ref=e237]
+                - generic [ref=e238]:
+                    - generic [ref=e240]: kt51_Helsinki_Lauttasaari
+                    - generic [ref=e243]: 11:01
+            - button "kt51_Espoo_Westend" [ref=e244] [cursor=pointer]:
+                - generic [ref=e246]: LIVE
+                - img "kt51_Espoo_Westend" [ref=e248]
+                - generic [ref=e249]:
+                    - generic [ref=e251]: kt51_Espoo_Westend
+                    - generic [ref=e254]: 11:05
+            - button "st101_Espoo_Karhusaari" [ref=e255] [cursor=pointer]:
+                - generic [ref=e257]: LIVE
+                - img "st101_Espoo_Karhusaari" [ref=e259]
+                - generic [ref=e260]:
+                    - generic [ref=e262]: st101_Espoo_Karhusaari
+                    - generic [ref=e265]: 10:58
+            - button "st101_Espoo_Keilalahti" [ref=e266] [cursor=pointer]:
+                - generic [ref=e268]: LIVE
+                - img "st101_Espoo_Keilalahti" [ref=e270]
+                - generic [ref=e271]:
+                    - generic [ref=e273]: st101_Espoo_Keilalahti
+                    - generic [ref=e276]: 10:59
+            - button "st101_Espoo_Otasolmu" [ref=e277] [cursor=pointer]:
+                - generic [ref=e279]: LIVE
+                - img "st101_Espoo_Otasolmu" [ref=e281]
+                - generic [ref=e282]:
+                    - generic [ref=e284]: st101_Espoo_Otasolmu
+                    - generic [ref=e287]: 10:59
+            - button "st101_Espoo_Keilaniemi_puomi_itä" [ref=e288] [cursor=pointer]:
+                - generic [ref=e290]: LIVE
+                - img "st101_Espoo_Keilaniemi_puomi_itä" [ref=e292]
+                - generic [ref=e293]:
+                    - generic [ref=e295]: st101_Espoo_Keilaniemi_puomi_itä
+                    - generic [ref=e298]: 10:59
+            - button "st101_Espoo_Miestentie" [ref=e299] [cursor=pointer]:
+                - generic [ref=e301]: LIVE
+                - img "st101_Espoo_Miestentie" [ref=e303]
+                - generic [ref=e304]:
+                    - generic [ref=e306]: st101_Espoo_Miestentie
+                    - generic [ref=e309]: 11:01
+            - button "st101_Espoo_Tekniikantie" [ref=e310] [cursor=pointer]:
+                - generic [ref=e312]: LIVE
+                - img "st101_Espoo_Tekniikantie" [ref=e314]
+                - generic [ref=e315]:
+                    - generic [ref=e317]: st101_Espoo_Tekniikantie
+                    - generic [ref=e320]: 10:57
+            - button "st101_Espoo_Innopoli" [ref=e321] [cursor=pointer]:
+                - generic [ref=e323]: LIVE
+                - img "st101_Espoo_Innopoli" [ref=e325]
+                - generic [ref=e326]:
+                    - generic [ref=e328]: st101_Espoo_Innopoli
+                    - generic [ref=e331]: 11:04
+            - button "st101_Espoo_Keilaranta" [ref=e332] [cursor=pointer]:
+                - generic [ref=e334]: LIVE
+                - img "st101_Espoo_Keilaranta" [ref=e336]
+                - generic [ref=e337]:
+                    - generic [ref=e339]: st101_Espoo_Keilaranta
+                    - generic [ref=e342]: 10:59
+            - button "st101_Espoo_Kuusisaarentie" [ref=e343] [cursor=pointer]:
+                - generic [ref=e345]: LIVE
+                - img "st101_Espoo_Kuusisaarentie" [ref=e347]
+                - generic [ref=e348]:
+                    - generic [ref=e350]: st101_Espoo_Kuusisaarentie
+                    - generic [ref=e353]: 10:59
+            - button "vt1_Helsinki_Munkkiniemi" [ref=e354] [cursor=pointer]:
+                - generic [ref=e356]: LIVE
+                - img "vt1_Helsinki_Munkkiniemi" [ref=e358]
+                - generic [ref=e359]:
+                    - generic [ref=e361]: vt1_Helsinki_Munkkiniemi
+                    - generic [ref=e364]: 10:59
+            - button "vt1_Espoo_Friisinmäki" [ref=e365] [cursor=pointer]:
+                - generic [ref=e367]: LIVE
+                - img "vt1_Espoo_Friisinmäki" [ref=e369]
+                - generic [ref=e370]:
+                    - generic [ref=e372]: vt1_Espoo_Friisinmäki
+                    - generic [ref=e375]: 11:01
+            - button "vt1_Espoo_Sinimäki" [ref=e376] [cursor=pointer]:
+                - generic [ref=e378]: LIVE
+                - img "vt1_Espoo_Sinimäki" [ref=e380]
+                - generic [ref=e381]:
+                    - generic [ref=e383]: vt1_Espoo_Sinimäki
+                    - generic [ref=e386]: 10:58
+            - button "vt1_Espoo_Sepänkylä" [ref=e387] [cursor=pointer]:
+                - generic [ref=e389]: LIVE
+                - img "vt1_Espoo_Sepänkylä" [ref=e391]
+                - generic [ref=e392]:
+                    - generic [ref=e394]: vt1_Espoo_Sepänkylä
+                    - generic [ref=e397]: 10:57
+            - button "vt1_Espoo_Tuomarila" [ref=e398] [cursor=pointer]:
+                - generic [ref=e400]: LIVE
+                - img "vt1_Espoo_Tuomarila" [ref=e402]
+                - generic [ref=e403]:
+                    - generic [ref=e405]: vt1_Espoo_Tuomarila
+                    - generic [ref=e408]: 11:01
+            - button "vt1_Espoo_Kirkkojärvi" [ref=e409] [cursor=pointer]:
+                - generic [ref=e411]: LIVE
+                - img "vt1_Espoo_Kirkkojärvi" [ref=e413]
+                - generic [ref=e414]:
+                    - generic [ref=e416]: vt1_Espoo_Kirkkojärvi
+                    - generic [ref=e419]: 11:01
+            - button "vt1_Espoo_Lommila" [ref=e420] [cursor=pointer]:
+                - generic [ref=e422]: LIVE
+                - img "vt1_Espoo_Lommila" [ref=e424]
+                - generic [ref=e425]:
+                    - generic [ref=e427]: vt1_Espoo_Lommila
+                    - generic [ref=e430]: 10:57
+    - dialog [ref=e433]:
+        - button "Close" [ref=e434]:
+            - generic [ref=e435]: X
+        - generic [ref=e436]:
+            - generic [ref=e438]:
+                - generic [ref=e439]: My cities
+                - generic [ref=e440]: Choose which cities you want to follow. You can change this later from Settings.
+            - generic [ref=e442]:
+                - generic [ref=e443]:
+                    - button "vantaa" [pressed] [ref=e444]
+                    - button "espoo" [pressed] [ref=e445]
+                    - button "helsinki" [pressed] [ref=e446]
+                    - button "+ More" [ref=e447]
+                - textbox "Add cities" [ref=e448]:
+                    - /placeholder: Add cities (comma separated)
+                    - text: vantaa, espoo, helsinki
+            - generic [ref=e449]:
+                - generic [ref=e450]:
+                    - checkbox "Show labels" [checked] [ref=e451]
+                    - generic [ref=e452]: Show labels
+                - button "Save" [ref=e454]
+```

@@ -60,12 +60,14 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
             key={c}
             aria-pressed={active}
             onClick={() => toggleCity(c)}
-            className={`px-2 py-1 text-xs rounded min-w-[64px] ${
-              active ? "bg-blue-600 text-white" : "bg-neutral-800 text-white/80"
+            className={`px-3 py-1 font-bold text-xs uppercase min-w-[64px] border-2 border-black shadow-neo-sm transition-all hover:-translate-y-0.5 ${
+              active
+                ? "bg-neo-blue text-white shadow-neo"
+                : "bg-white text-black hover:bg-neo-blue hover:text-white"
             }`}
             title={t("city.toggleTitle", { city: c })}
           >
-            {c.charAt(0).toUpperCase() + c.slice(1)}
+            {c}
           </button>
         );
       }),
@@ -74,11 +76,11 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
 
   return (
     <div className="flex items-center gap-2 w-full">
-      <div className="city-selector flex gap-1 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1">
+      <div className="city-selector flex gap-2 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1 py-1">
         {buttons}
         <button
           onClick={() => setShowAllCities(!showAllCities)}
-          className="px-2 py-1 text-xs rounded bg-neutral-700 text-white/80 hover:bg-neutral-600 min-w-[64px]"
+          className="px-3 py-1 font-bold text-xs bg-white text-black border-2 border-black shadow-neo-sm hover:shadow-neo hover:bg-neo-offwhite transition-all uppercase min-w-[64px]"
           title={showAllCities ? t("city.showLess") : t("city.showMore")}
         >
           {showAllCities ? t("city.showLess") : t("city.showMore")}
@@ -86,7 +88,7 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
       </div>
 
       <input
-        className="ml-2 px-3 py-1 rounded bg-neutral-800 text-white text-sm outline-none min-w-[160px]"
+        className="ml-2 px-3 py-1 bg-white text-black border-2 border-black shadow-neo-sm font-bold text-sm outline-none min-w-[160px] placeholder:text-neutral-500 focus:shadow-neo focus:bg-neo-offwhite transition-all"
         placeholder={t("city.addPlaceholder")}
         value={input}
         aria-label={t("city.addAria")}

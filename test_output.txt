@@ -1,0 +1,51 @@
+
+Running 5 tests using 5 workers
+
+  Ô£ÿ  1 [firefox] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive (1ms)
+  Ô£ÿ  3 [Mobile Safari] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive (1ms)
+  Ô£ÿ  4 [webkit] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive (2ms)
+  Ô£ô  5 [Mobile Chrome] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive (28.1s)
+  Ô£ô  2 [chromium] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive (28.2s)
+
+
+  1) [firefox] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive ÔöÇÔöÇÔöÇ
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\moxch\AppData\Local\ms-playwright\firefox-1509\firefox\firefox.exe
+    ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+    Ôòæ Looks like Playwright Test or Playwright was just installed or updated. Ôòæ
+    Ôòæ Please run the following command to download new browsers:              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ     npx playwright install                                              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ <3 Playwright Team                                                      Ôòæ
+    ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+  2) [webkit] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive ÔöÇÔöÇÔöÇÔöÇ
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\moxch\AppData\Local\ms-playwright\webkit-2248\Playwright.exe
+    ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+    Ôòæ Looks like Playwright Test or Playwright was just installed or updated. Ôòæ
+    Ôòæ Please run the following command to download new browsers:              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ     npx playwright install                                              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ <3 Playwright Team                                                      Ôòæ
+    ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+  3) [Mobile Safari] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive 
+
+    Error: browserType.launch: Executable doesn't exist at C:\Users\moxch\AppData\Local\ms-playwright\webkit-2248\Playwright.exe
+    ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+    Ôòæ Looks like Playwright Test or Playwright was just installed or updated. Ôòæ
+    Ôòæ Please run the following command to download new browsers:              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ     npx playwright install                                              Ôòæ
+    Ôòæ                                                                         Ôòæ
+    Ôòæ <3 Playwright Team                                                      Ôòæ
+    ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+  3 failed
+    [firefox] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive ÔöÇÔöÇÔöÇÔöÇ
+    [webkit] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive ÔöÇÔöÇÔöÇÔöÇÔöÇ
+    [Mobile Safari] ÔÇ║ tests\responsive.spec.ts:67:3 ÔÇ║ Responsive Design ÔÇ║ modals should be responsive 
+  2 passed (29.4s)

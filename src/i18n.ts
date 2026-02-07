@@ -19,7 +19,7 @@ export const getAppLanguage = (): AppLanguage => {
     typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
   if (storedRaw) return normalizeLanguage(storedRaw);
   const nav = normalizeLanguage(
-    typeof navigator !== "undefined" ? navigator.language : ""
+    typeof navigator !== "undefined" ? navigator.language : "",
   );
   return nav;
 };

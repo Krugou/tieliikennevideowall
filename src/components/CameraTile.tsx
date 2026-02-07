@@ -37,7 +37,7 @@ const CameraTileInner: React.FC<Props> = ({
   const recent = isRecent(latestModified);
   const src = useMemo(
     () => buildSrc(imageUrl, cacheBuster),
-    [imageUrl, cacheBuster]
+    [imageUrl, cacheBuster],
   );
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -84,24 +84,16 @@ const CameraTileInner: React.FC<Props> = ({
       role={onClick ? "button" : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      className="tile relative rounded-md overflow-hidden bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 transform transition-all duration-200 ease-out will-change-transform z-0 cursor-pointer
-                 group-hover:scale-95 group-hover:opacity-90 hover:!scale-110 hover:z-30 hover:shadow-2xl hover:brightness-105 aspect-[16/10]"
+      className="group relative border-4 border-black bg-white shadow-neo hover:shadow-neo-xl hover:-translate-y-1 hover:-translate-x-1 active:translate-y-1 active:translate-x-1 transition-all duration-75 cursor-pointer overflow-hidden z-10 hover:z-20 aspect-[16/10]"
     >
+      {/* Live / Status Indicator - Brutalist Tag */}
       {recent && (
-        <div className="absolute top-2 right-2 flex items-center gap-2">
+        <div className="absolute top-0 left-0 z-20 flex flex-col gap-1 p-1">
+          <div className="bg-neo-green border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter animate-blink shadow-neo-sm">
+            LIVE
+          </div>
           {weather?.temperatureC !== undefined && (
-            <span
-              title={
-                weather.observationTime
-                  ? t("weather.titleSimple", {
-                      time: new Date(weather.observationTime).toLocaleString(
-                        locale
-                      ),
-                    })
-                  : undefined
-              }
-              className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded bg-black/50 text-white backdrop-blur"
-            >
+            <div className="bg-white border-2 border-black px-1 py-0.5 text-[10px] font-mono font-bold shadow-neo-sm">
               {weather.windSpeedMs !== undefined
                 ? t("weather.compactTempWind", {
                     temp: formatNumber(weather.temperatureC, 0),
@@ -110,55 +102,68 @@ const CameraTileInner: React.FC<Props> = ({
                 : t("weather.compactTemp", {
                     temp: formatNumber(weather.temperatureC, 0),
                   })}
-            </span>
+            </div>
           )}
-          <span
-            title={t("camera.updatedRecentTitle")}
-            className="inline-block w-3 h-3 rounded-full bg-red-500 shadow animate-pulse ring-2 ring-red-400/50"
-          />
         </div>
       )}
 
-      <div
-        className={`w-full h-full ${recent ? "ring-2 ring-red-400/10" : ""}`}
-      >
+      {/* Image Container - Grayscale to Color */}
+      <div className="w-full h-full relative bg-neutral-200">
         {src ? (
           <img
             src={src}
             alt={name}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-all duration-75 ${recent ? "" : "opacity-70 contrast-125"}`}
             loading="lazy"
             onError={(e) => {
               (e.target as HTMLImageElement).style.opacity = "0.6";
             }}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full text-neutral-400 bg-gradient-to-br from-neutral-800 to-neutral-900 p-2">
-            <div className="text-center px-2">
-              <div className="text-sm font-medium truncate">{name}</div>
-              <div className="text-[11px] opacity-70 truncate">
-                {municipality}
+          <div className="flex items-center justify-center w-full h-full bg-neo-offwhite p-2 border-t-2 border-black">
+            <div className="text-center">
+              <div className="font-mono text-xs font-bold bg-neo-pink text-white px-2 py-1 transform -rotate-3 border-2 border-black shadow-neo-sm">
+                NO SIGNAL
+              </div>
+              <div className="mt-2 text-xs font-mono font-bold truncate max-w-[150px]">
+                {name}
               </div>
             </div>
           </div>
         )}
+
+        {/* Scanline overlay for aesthetic */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20" />
       </div>
 
+      {/* Labels - Rotated Badges */}
       {showLabels && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-[11px] sm:text-xs p-2 sm:p-2 backdrop-blur-sm">
-          <div className="font-medium truncate">{name}</div>
-          {municipality && (
-            <div className="opacity-80 text-[10px] truncate">
-              {municipality}
+        <div className="absolute bottom-2 right-2 flex flex-col items-end gap-1 z-20 max-w-[90%]">
+          <div className="bg-neo-yellow border-2 border-black px-2 py-1 shadow-neo-sm transform -rotate-1 group-hover:rotate-0 transition-transform">
+            <div className="font-sans font-black text-xs uppercase truncate leading-none text-black">
+              {name}
             </div>
-          )}
-          {latestModified && (
-            <div className="opacity-70 text-[10px]">
-              {t("camera.lastLabel", {
-                time: new Date(latestModified).toLocaleString(locale),
-              })}
-            </div>
-          )}
+          </div>
+
+          <div className="flex gap-1">
+            {municipality && (
+              <div className="bg-neo-blue border-2 border-black px-1 py-0.5 shadow-neo-sm transform rotate-1">
+                <div className="font-mono font-bold text-[9px] uppercase text-white leading-none">
+                  {municipality}
+                </div>
+              </div>
+            )}
+            {latestModified && (
+              <div className="bg-white border-2 border-black px-1 py-0.5 shadow-neo-sm transform">
+                <div className="font-mono font-bold text-[9px] text-black leading-none">
+                  {new Date(latestModified).toLocaleTimeString(locale, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </article>

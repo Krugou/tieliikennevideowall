@@ -19,30 +19,26 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      <button
-        type="button"
-        aria-label="Close"
-        className="absolute inset-0 bg-black/60"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-neo-yellow/50 backdrop-blur-sm bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')]"
         onClick={onClose}
+        aria-hidden="true"
       />
-
-      <div className="relative z-10 w-full max-w-[1200px] max-h-[90vh] overflow-auto rounded">
+      <div
+        className="relative z-10 w-full max-w-lg overflow-hidden bg-white border-4 border-black shadow-neo-xl animate-pop"
+        role="dialog"
+        aria-modal="true"
+        data-testid="modal-content"
+      >
         <button
-          type="button"
           onClick={onClose}
+          className="absolute top-2 right-2 bg-neo-red text-white border-2 border-black w-8 h-8 flex items-center justify-center hover:bg-red-600 shadow-neo-sm hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all z-20"
           aria-label="Close"
-          className="absolute top-3 right-3 z-50 bg-white/10 hover:bg-white/20 p-2 rounded"
         >
-          ✕
+          <span className="font-mono font-bold text-lg">X</span>
         </button>
-
-        {/* Modal content */}
-        <div className="rounded">{children}</div>
+        {children}
       </div>
     </div>
   );
