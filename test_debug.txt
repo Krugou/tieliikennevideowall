@@ -1,0 +1,77 @@
+
+Running 4 tests using 4 workers
+
+
+[1A[2K[WebServer] [vite:css][postcss] @import must precede all other statements (besides @charset or empty @layer)
+[WebServer] 18 |  
+[WebServer] 19 |  /* Google Fonts Import */
+[WebServer] 20 |  @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:wght@400;700&family=Public+S...
+[WebServer]    |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[WebServer] 21 |  
+[WebServer] 22 |  html,
+[1A[2K[1/4] [chromium] ÔÇ║ tests\functional.spec.ts:45:3 ÔÇ║ Functional Tests ÔÇ║ should switch languages
+[1A[2K[2/4] [chromium] ÔÇ║ tests\functional.spec.ts:66:3 ÔÇ║ Functional Tests ÔÇ║ should toggle map modal
+[1A[2K[3/4] [chromium] ÔÇ║ tests\functional.spec.ts:25:3 ÔÇ║ Functional Tests ÔÇ║ should allow selecting cities
+[1A[2K[4/4] [chromium] ÔÇ║ tests\functional.spec.ts:77:3 ÔÇ║ Functional Tests ÔÇ║ should toggle settings modal
+[1A[2K[chromium] ÔÇ║ tests\functional.spec.ts:45:3 ÔÇ║ Functional Tests ÔÇ║ should switch languages
+LocalStorage: {"tieliikenne_onboarded_v1":"1","tieliikenne_lang":"en","tieliikenne_my_cities_v1":"vantaa,espoo,helsinki"}
+
+[1A[2K[chromium] ÔÇ║ tests\functional.spec.ts:66:3 ÔÇ║ Functional Tests ÔÇ║ should toggle map modal
+LocalStorage: {"tieliikenne_onboarded_v1":"1","tieliikenne_lang":"en","tieliikenne_my_cities_v1":"vantaa,espoo,helsinki"}
+
+[1A[2K[chromium] ÔÇ║ tests\functional.spec.ts:25:3 ÔÇ║ Functional Tests ÔÇ║ should allow selecting cities
+LocalStorage: {"tieliikenne_onboarded_v1":"1","tieliikenne_lang":"en","tieliikenne_my_cities_v1":"vantaa,espoo,helsinki"}
+
+[1A[2K[chromium] ÔÇ║ tests\functional.spec.ts:77:3 ÔÇ║ Functional Tests ÔÇ║ should toggle settings modal
+LocalStorage: {"tieliikenne_onboarded_v1":"1","tieliikenne_lang":"en","tieliikenne_my_cities_v1":"vantaa,espoo,helsinki"}
+
+[1A[2K  1) [chromium] ÔÇ║ tests\functional.spec.ts:66:3 ÔÇ║ Functional Tests ÔÇ║ should toggle map modal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: /close/i }) resolved to 2 elements:
+        1) <button type="button" aria-label="Close" class="absolute top-2 right-2 p-2 bg-black text-white hover:bg-neutral-800 shadow-neo-sm hover:shadow-neo transition-all rounded-full z-10 hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px">ÔÇª</button> aka getByLabel('Close')
+        2) <button type="button" class="mt-4 px-4 py-2 font-bold bg-black text-white border-2 border-white shadow-neo-sm hover:shadow-neo hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px transition-all uppercase">Close</button> aka getByText('Close')
+
+    Call log:
+    [2m  - waiting for getByRole('button', { name: /close/i })[22m
+
+
+      71 |
+      72 |     // Close
+    > 73 |     await page.getByRole('button', { name: /close/i }).click();
+         |                                                        ^
+      74 |     await expect(page.getByRole('dialog')).not.toBeVisible();
+      75 |   });
+      76 |
+        at C:\Users\moxch\Documents\GitHub\tieliikennevideowall\tests\functional.spec.ts:73:56
+
+    Error Context: test-results\functional-Functional-Tests-should-toggle-map-modal-chromium\error-context.md
+
+
+[1A[2K  2) [chromium] ÔÇ║ tests\functional.spec.ts:77:3 ÔÇ║ Functional Tests ÔÇ║ should toggle settings modal ÔöÇÔöÇ
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: /close/i }) resolved to 2 elements:
+        1) <button type="button" aria-label="Close" class="absolute top-2 right-2 p-2 bg-black text-white hover:bg-neutral-800 shadow-neo-sm hover:shadow-neo transition-all rounded-full z-10 hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px">ÔÇª</button> aka getByLabel('Close')
+        2) <button type="button" class="px-3 py-2 rounded bg-white/5 hover:bg-white/10 text-sm">Close</button> aka getByText('Close')
+
+    Call log:
+    [2m  - waiting for getByRole('button', { name: /close/i })[22m
+
+
+      86 |     await expect(page.getByText('My cities')).toBeVisible();
+      87 |
+    > 88 |     await page.getByRole('button', { name: /close/i }).click();
+         |                                                        ^
+      89 |     await expect(page.getByRole('dialog')).not.toBeVisible();
+      90 |   });
+      91 | });
+        at C:\Users\moxch\Documents\GitHub\tieliikennevideowall\tests\functional.spec.ts:88:56
+
+    Error Context: test-results\functional-Functional-Tests-should-toggle-settings-modal-chromium\error-context.md
+
+
+[1A[2K  2 failed
+    [chromium] ÔÇ║ tests\functional.spec.ts:66:3 ÔÇ║ Functional Tests ÔÇ║ should toggle map modal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    [chromium] ÔÇ║ tests\functional.spec.ts:77:3 ÔÇ║ Functional Tests ÔÇ║ should toggle settings modal ÔöÇÔöÇÔöÇ
+  2 passed (2.6s)
+
+[36m  Serving HTML report at http://localhost:62742. Press Ctrl+C to quit.[39m
