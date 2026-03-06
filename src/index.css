@@ -1,81 +1,165 @@
 @import "tailwindcss";
 
-/* Google Fonts Import */
-@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Courier+Prime:wght@400;700&family=Public+Sans:wght@400;700;900&display=swap");
+/* Finlandica – Finland's national typeface */
+@import url("https://fonts.googleapis.com/css2?family=Finlandica:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap");
 
+/* ─────────────────────────────────────────────
+   Tailwind v4 – CSS-native theme tokens
+   ───────────────────────────────────────────── */
+@theme {
+  --font-sans: "Finlandica", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  /* Finnish institutional palette */
+  --color-finn-blue: #003087; /* Finnish flag / Traficom primary */
+  --color-finn-sky: #00529b; /* Interactive blue */
+  --color-finn-hover: #002370; /* Dark hover state */
+  --color-finn-bg: #f0f4f8; /* Page background */
+  --color-finn-surface: #ffffff; /* Card / panel surface */
+  --color-finn-border: #c8d0d8; /* Muted borders */
+  --color-finn-text: #1a1a1a; /* Primary text */
+  --color-finn-muted: #6b7280; /* Secondary / placeholder */
+  --color-finn-green: #1d6a31; /* Road sign green / LIVE indicator */
+  --color-finn-amber: #c6830a; /* Warning */
+  --color-finn-red: #b91c1c; /* Error / rate-limit */
+
+  /* Legacy neo-* aliases — kept so no class references silently break
+     while we transition; values map to closest Finnish equivalents */
+  --color-neo-yellow: #fcd34d;
+  --color-neo-pink: #db2777;
+  --color-neo-blue: #003087;
+  --color-neo-green: #1d6a31;
+  --color-neo-red: #b91c1c;
+  --color-neo-offwhite: #f0f4f8;
+
+  /* Shadows */
+  --shadow-neo-sm: 2px 2px 0 0 #c8d0d8;
+  --shadow-neo: 4px 4px 0 0 #c8d0d8;
+  --shadow-neo-xl: 6px 6px 0 0 #c8d0d8;
+
+  /* Animations */
+  --animate-pop: pop 0.15s ease-out;
+  --animate-shake: shake 0.4s ease;
+  --animate-blink: blink 1.4s step-start infinite;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-4px);
+    }
+    40% {
+      transform: translateX(4px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Base styles
+   ───────────────────────────────────────────── */
 html,
 body,
 #root {
   height: 100%;
-  background-color: #f0f0f0; /* Soft gray to make white/colors pop */
-  color: #000000;
-  font-family: "Public Sans", sans-serif;
-  overflow-x: hidden; /* Prevent horizontal scroll from brutal shadows/transforms */
+  background-color: var(--color-finn-bg);
+  color: var(--color-finn-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Brutalist Scrollbar */
+/* ─────────────────────────────────────────────
+   Scrollbar – clean Finnish minimal style
+   ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 16px;
-  background: #000000;
-  border-left: 2px solid #000;
+  width: 8px;
+  background: var(--color-finn-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ffde00; /* Neo Yellow */
-  border: 2px solid #000000;
-  box-shadow: inset 2px 2px 0px 0px #ffffff;
+  background: var(--color-finn-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-finn-muted);
 }
 
 ::-webkit-scrollbar-track {
-  background: #ffffff;
-  border-left: 2px solid #000;
-  background-image:
-    radial-gradient(#000 15%, transparent 16%),
-    radial-gradient(#000 15%, transparent 16%);
-  background-size: 8px 8px;
-  background-position:
-    0 0,
-    4px 4px;
+  background: var(--color-finn-bg);
 }
 
-/* Default Selection */
+/* ─────────────────────────────────────────────
+   Selection
+   ───────────────────────────────────────────── */
 ::selection {
-  background-color: #ff0099; /* Neo Pink */
+  background-color: var(--color-finn-blue);
   color: #ffffff;
 }
 
-/* Base Headings */
+/* ─────────────────────────────────────────────
+   Typography
+   ───────────────────────────────────────────── */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: "Archivo Black", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: -0.05em;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* Code / Monospace overrides */
 code,
 pre,
 .mono {
-  font-family: "Courier Prime", monospace;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
 }
 
-/* Mobile spacing and small-screen UI adjustments */
-header h1 {
-  line-height: 1;
-}
-
-/* Hide horizontal scrollbar for CitySelector in webkit for a cleaner look */
+/* ─────────────────────────────────────────────
+   City selector horizontal scroll
+   ───────────────────────────────────────────── */
 .city-selector {
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
+
 .city-selector::-webkit-scrollbar {
-  height: 6px;
+  height: 4px;
 }
+
 .city-selector::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  background: var(--color-finn-border);
+  border-radius: 2px;
 }

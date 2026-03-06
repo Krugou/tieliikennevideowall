@@ -60,10 +60,10 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
             key={c}
             aria-pressed={active}
             onClick={() => toggleCity(c)}
-            className={`px-3 py-1 font-bold text-xs uppercase min-w-[64px] border-2 border-black shadow-neo-sm transition-all hover:-translate-y-0.5 ${
+            className={`shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium rounded transition-colors border ${
               active
-                ? "bg-neo-blue text-white shadow-neo"
-                : "bg-white text-black hover:bg-neo-blue hover:text-white"
+                ? "bg-finn-blue text-white border-finn-blue"
+                : "bg-white text-finn-text border-finn-border hover:border-finn-sky hover:text-finn-sky"
             }`}
             title={t("city.toggleTitle", { city: c })}
           >
@@ -75,20 +75,22 @@ const CitySelectorInner: React.FC<Props> = ({ selectedCities, onChange }) => {
   );
 
   return (
-    <div className="flex items-center gap-2 w-full">
-      <div className="city-selector flex gap-2 overflow-x-auto whitespace-nowrap max-w-full -mx-1 px-1 py-1">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 w-full">
+      {/* City pills: horizontal scroll */}
+      <div className="city-selector flex gap-1 sm:gap-1.5 overflow-x-auto whitespace-nowrap py-0.5 shrink-0">
         {buttons}
         <button
           onClick={() => setShowAllCities(!showAllCities)}
-          className="px-3 py-1 font-bold text-xs bg-white text-black border-2 border-black shadow-neo-sm hover:shadow-neo hover:bg-neo-offwhite transition-all uppercase min-w-[64px]"
+          className="shrink-0 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium text-finn-muted border border-finn-border rounded hover:border-finn-sky hover:text-finn-sky transition-colors"
           title={showAllCities ? t("city.showLess") : t("city.showMore")}
         >
           {showAllCities ? t("city.showLess") : t("city.showMore")}
         </button>
       </div>
 
+      {/* Text input: full width on mobile, auto on larger */}
       <input
-        className="ml-2 px-3 py-1 bg-white text-black border-2 border-black shadow-neo-sm font-bold text-sm outline-none min-w-[160px] placeholder:text-neutral-500 focus:shadow-neo focus:bg-neo-offwhite transition-all"
+        className="w-full sm:w-auto sm:min-w-[140px] px-2 sm:px-3 py-1 sm:py-1.5 bg-white text-finn-text border border-finn-border rounded text-xs sm:text-sm font-sans outline-none placeholder:text-finn-muted focus:border-finn-blue focus:ring-1 focus:ring-finn-blue/30 transition-all"
         placeholder={t("city.addPlaceholder")}
         value={input}
         aria-label={t("city.addAria")}

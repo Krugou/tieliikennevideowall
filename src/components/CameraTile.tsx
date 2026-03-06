@@ -84,16 +84,16 @@ const CameraTileInner: React.FC<Props> = ({
       role={onClick ? "button" : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      className="group relative border-4 border-black bg-white shadow-neo hover:shadow-neo-xl hover:-translate-y-1 hover:-translate-x-1 active:translate-y-1 active:translate-x-1 transition-all duration-75 cursor-pointer overflow-hidden z-10 hover:z-20 aspect-[16/10]"
+      className="group relative border border-finn-border bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-100 cursor-pointer overflow-hidden z-10 hover:z-20 aspect-[16/10]"
     >
       {/* Live / Status Indicator - Brutalist Tag */}
       {recent && (
-        <div className="absolute top-0 left-0 z-20 flex flex-col gap-1 p-1">
-          <div className="bg-neo-green border-2 border-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-tighter animate-blink shadow-neo-sm">
+        <div className="absolute top-0 left-0 z-20 flex flex-col gap-1 p-1.5">
+          <div className="bg-finn-green text-white px-1.5 py-0.5 text-[9px] font-semibold tracking-wide rounded-sm">
             LIVE
           </div>
           {weather?.temperatureC !== undefined && (
-            <div className="bg-white border-2 border-black px-1 py-0.5 text-[10px] font-mono font-bold shadow-neo-sm">
+            <div className="bg-white/90 text-finn-text px-1.5 py-0.5 text-[9px] font-medium rounded-sm shadow-sm">
               {weather.windSpeedMs !== undefined
                 ? t("weather.compactTempWind", {
                     temp: formatNumber(weather.temperatureC, 0),
@@ -113,54 +113,47 @@ const CameraTileInner: React.FC<Props> = ({
           <img
             src={src}
             alt={name}
-            className={`w-full h-full object-cover transition-all duration-75 ${recent ? "" : "opacity-70 contrast-125"}`}
+            className={`w-full h-full object-cover transition-all duration-100 ${recent ? "" : "opacity-60 grayscale"}`}
             loading="lazy"
             onError={(e) => {
               (e.target as HTMLImageElement).style.opacity = "0.6";
             }}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-neo-offwhite p-2 border-t-2 border-black">
+          <div className="flex items-center justify-center w-full h-full bg-finn-bg p-2">
             <div className="text-center">
-              <div className="font-mono text-xs font-bold bg-neo-pink text-white px-2 py-1 transform -rotate-3 border-2 border-black shadow-neo-sm">
-                NO SIGNAL
+              <div className="font-sans text-xs font-medium text-finn-muted">
+                {t("camera.noImage")}
               </div>
-              <div className="mt-2 text-xs font-mono font-bold truncate max-w-[150px]">
+              <div className="mt-1 text-xs text-finn-muted truncate max-w-[150px]">
                 {name}
               </div>
             </div>
           </div>
         )}
 
-        {/* Scanline overlay for aesthetic */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%] opacity-20" />
+        {/* Very subtle scanline for visual depth */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.05)_50%)] z-10 pointer-events-none bg-size-[100%_2px] opacity-30" />
       </div>
 
       {/* Labels - Rotated Badges */}
       {showLabels && (
-        <div className="absolute bottom-2 right-2 flex flex-col items-end gap-1 z-20 max-w-[90%]">
-          <div className="bg-neo-yellow border-2 border-black px-2 py-1 shadow-neo-sm transform -rotate-1 group-hover:rotate-0 transition-transform">
-            <div className="font-sans font-black text-xs uppercase truncate leading-none text-black">
-              {name}
-            </div>
+        <div className="absolute bottom-0 left-0 right-0 z-20 px-2 py-1.5 bg-linear-to-t from-black/60 to-transparent">
+          <div className="font-sans font-semibold text-[10px] text-white truncate leading-tight">
+            {name}
           </div>
-
-          <div className="flex gap-1">
+          <div className="flex gap-1.5 mt-0.5">
             {municipality && (
-              <div className="bg-neo-blue border-2 border-black px-1 py-0.5 shadow-neo-sm transform rotate-1">
-                <div className="font-mono font-bold text-[9px] uppercase text-white leading-none">
-                  {municipality}
-                </div>
+              <div className="text-white/70 text-[9px] font-medium">
+                {municipality}
               </div>
             )}
             {latestModified && (
-              <div className="bg-white border-2 border-black px-1 py-0.5 shadow-neo-sm transform">
-                <div className="font-mono font-bold text-[9px] text-black leading-none">
-                  {new Date(latestModified).toLocaleTimeString(locale, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
+              <div className="text-white/60 text-[9px]">
+                {new Date(latestModified).toLocaleTimeString(locale, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </div>
             )}
           </div>

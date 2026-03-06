@@ -303,145 +303,141 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="h-full w-full flex flex-col bg-neo-offwhite text-black font-mono">
+    <div className="h-full w-full flex flex-col bg-finn-bg text-finn-text font-sans">
       {showMenu && (
-        <header className="p-4 bg-neo-yellow border-b-4 border-black shadow-neo z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative">
-          {/* Top Row: Title + Stats */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full lg:w-auto">
-            <h1 className="text-xl sm:text-2xl font-sans font-black tracking-tighter uppercase transform -rotate-1 bg-black text-white px-2 py-1 shadow-neo-sm self-start sm:self-auto break-words max-w-full">
+        <header className="bg-finn-blue text-white shadow-md z-30">
+          {/* Row 1: Title + stats — always visible */}
+          <div className="px-3 sm:px-4 py-2 flex items-center justify-between gap-2 flex-wrap">
+            <h1 className="text-base sm:text-lg md:text-xl font-semibold tracking-tight truncate">
               {t("app.title")}
             </h1>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex flex-col">
-                <div className="text-xs font-bold font-mono border-2 border-black bg-white px-1 shadow-neo-sm">
-                  {new Date(now).toLocaleString(locale)}
-                </div>
-              </div>
-
-              <div className="text-xs font-bold bg-neo-pink text-white border-2 border-black px-2 py-1 shadow-neo-sm">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] sm:text-xs bg-white/15 px-1.5 py-0.5 rounded whitespace-nowrap">
+                {new Date(now).toLocaleString(locale)}
+              </span>
+              <span className="text-[10px] sm:text-xs bg-white/20 px-1.5 py-0.5 rounded whitespace-nowrap">
                 {t("app.cameras", { count: cameraCount })}
-              </div>
+              </span>
               {nextRefreshRemaining !== null && (
-                <div className="text-xs font-bold bg-neo-blue text-white border-2 border-black px-2 py-1 shadow-neo-sm animate-pulse">
+                <span className="text-[10px] sm:text-xs bg-white/15 px-1.5 py-0.5 rounded whitespace-nowrap">
                   {t("app.nextReload", {
                     time: formatMs(nextRefreshRemaining),
                   })}
-                </div>
+                </span>
               )}
             </div>
           </div>
 
-          {/* Bottom Row: Controls + City Selector */}
-          <div className="w-full lg:w-auto flex flex-col md:flex-row items-start md:items-center gap-4 justify-between lg:justify-end">
-            <div className="w-full md:w-auto">
-              <CitySelector
-                selectedCities={selectedCities}
-                onChange={(c) => setSelectedCities(c)}
-              />
-            </div>
+          {/* Row 2: City selector */}
+          <div className="px-3 sm:px-4 pb-2">
+            <CitySelector
+              selectedCities={selectedCities}
+              onChange={(c) => setSelectedCities(c)}
+            />
+          </div>
 
-            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto lg:justify-end">
-              <button
-                type="button"
-                title={t("app.showMap")}
-                aria-label={t("app.showMap")}
-                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all inline-flex items-center gap-2"
-                onClick={() => setMapOpen(true)}
+          {/* Row 3: Action buttons — horizontally scrollable on mobile */}
+          <div className="px-3 sm:px-4 pb-2 flex items-center gap-1.5 overflow-x-auto">
+            <button
+              type="button"
+              title={t("app.showMap")}
+              aria-label={t("app.showMap")}
+              className="shrink-0 px-2.5 py-1.5 text-[11px] sm:text-xs font-medium bg-white/15 hover:bg-white/25 rounded transition-colors inline-flex items-center gap-1"
+              onClick={() => setMapOpen(true)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                aria-hidden="true"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  aria-hidden="true"
-                  className="opacity-100"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"
-                  />
-                </svg>
-                <span className="uppercase">{t("app.map")}</span>
-              </button>
-
-              <button
-                type="button"
-                title={t("app.settings")}
-                aria-label={t("settings.open")}
-                data-testid="settings-button"
-                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all inline-flex items-center gap-2"
-                onClick={() => setSettingsOpen(true)}
-              >
-                {SettingsIcon}
-                <span className="uppercase">{t("app.settings")}</span>
-              </button>
-
-              <select
-                className="flex-1 sm:flex-none px-2 py-1 font-bold text-xs bg-white border-2 border-black shadow-neo-sm focus:outline-none cursor-pointer min-w-[50px]"
-                value={i18n.language}
-                aria-label="Language"
-                onChange={(e) => {
-                  setAppLanguage(e.target.value as "fi" | "sv" | "en");
-                }}
-              >
-                <option value="fi">FI</option>
-                <option value="sv">SV</option>
-                <option value="en">EN</option>
-              </select>
-
-              <label className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 text-xs font-bold bg-white border-2 border-black px-2 py-1 shadow-neo-sm cursor-pointer hover:bg-neo-offwhite">
-                <input
-                  type="checkbox"
-                  checked={showLabels}
-                  onChange={(e) => setShowLabels(e.target.checked)}
-                  className="accent-black w-4 h-4"
+                <path
+                  fill="currentColor"
+                  d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"
                 />
-                <span className="uppercase">{t("app.showLabels")}</span>
-              </label>
+              </svg>
+              {t("app.map")}
+            </button>
 
-              <button
-                title={t("app.refreshNow")}
-                aria-label={t("app.refreshNow")}
-                className="flex-1 sm:flex-none justify-center px-3 py-1 font-bold text-xs bg-neo-green border-2 border-black shadow-neo-sm hover:shadow-neo hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all uppercase"
-                onClick={manualRefresh}
-                disabled={loading}
-              >
-                {t("app.refresh")}
-              </button>
-            </div>
+            <button
+              type="button"
+              title={t("app.settings")}
+              aria-label={t("settings.open")}
+              data-testid="settings-button"
+              className="shrink-0 px-2.5 py-1.5 text-[11px] sm:text-xs font-medium bg-white/15 hover:bg-white/25 rounded transition-colors inline-flex items-center gap-1"
+              onClick={() => setSettingsOpen(true)}
+            >
+              {SettingsIcon}
+              {t("app.settings")}
+            </button>
+
+            <select
+              className="shrink-0 px-2 py-1.5 text-[11px] sm:text-xs font-medium bg-white/15 border border-white/30 rounded focus:outline-none cursor-pointer"
+              value={i18n.language}
+              aria-label="Language"
+              onChange={(e) =>
+                setAppLanguage(e.target.value as "fi" | "sv" | "en")
+              }
+            >
+              <option value="fi" className="text-finn-text bg-white">
+                FI
+              </option>
+              <option value="sv" className="text-finn-text bg-white">
+                SV
+              </option>
+              <option value="en" className="text-finn-text bg-white">
+                EN
+              </option>
+            </select>
+
+            <label className="shrink-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium bg-white/15 px-2 py-1.5 rounded cursor-pointer hover:bg-white/25 transition-colors">
+              <input
+                type="checkbox"
+                checked={showLabels}
+                onChange={(e) => setShowLabels(e.target.checked)}
+                className="w-3 h-3 accent-white"
+              />
+              {t("app.showLabels")}
+            </label>
+
+            <button
+              title={t("app.refreshNow")}
+              aria-label={t("app.refreshNow")}
+              className="shrink-0 px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold bg-white text-finn-blue rounded hover:bg-finn-bg transition-colors disabled:opacity-50"
+              onClick={manualRefresh}
+              disabled={loading}
+            >
+              {t("app.refresh")}
+            </button>
           </div>
         </header>
       )}
 
       {rateLimited && (
-        <div className="m-4 p-4 bg-neo-pink border-4 border-black shadow-neo flex items-center justify-between animate-shake">
-          <div className="font-bold text-white uppercase text-lg">
+        <div className="mx-2 sm:mx-4 mt-2 px-3 py-2 sm:py-3 bg-finn-red text-white rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="font-medium text-xs sm:text-sm">
             {t("rateLimit.banner", {
               time: retryAt
                 ? formatMs(Math.max(0, retryAt - Date.now()))
                 : "...",
             })}
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                manualRefresh();
-              }}
-              className="text-sm font-bold bg-black text-white px-4 py-2 border-2 border-white hover:bg-neutral-800 shadow-neo-sm"
-            >
-              {t("rateLimit.retryNow")}
-            </button>
-          </div>
+          <button
+            onClick={() => manualRefresh()}
+            className="text-xs font-semibold bg-white text-finn-red px-3 py-1.5 rounded hover:bg-finn-bg transition-colors shrink-0"
+          >
+            {t("rateLimit.retryNow")}
+          </button>
         </div>
       )}
 
-      <main className="flex-1 overflow-auto p-4 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]">
+      <main className="flex-1 overflow-auto p-1.5 sm:p-2 md:p-4 bg-finn-bg">
         {!showMenu && (
           <button
             type="button"
             title={t("app.settings")}
             aria-label={t("settings.open")}
-            className="fixed bottom-6 right-6 z-40 bg-neo-yellow border-4 border-black p-4 shadow-neo hover:shadow-neo-xl hover:scale-110 transition-transform"
+            className="fixed bottom-4 right-4 z-40 bg-finn-blue text-white p-3 sm:p-4 rounded-full shadow-lg hover:bg-finn-hover transition-colors"
             onClick={() => setSettingsOpen(true)}
           >
             {SettingsIcon}
@@ -449,15 +445,15 @@ const App: React.FC = () => {
         )}
 
         {loading && (
-          <div className="p-8 text-center">
-            <div className="inline-block text-2xl font-black bg-neo-blue text-white px-6 py-4 border-4 border-black shadow-neo animate-bounce">
+          <div className="p-6 sm:p-8 text-center">
+            <div className="inline-block text-sm sm:text-base font-medium text-finn-blue">
               {t("app.loadingCameras")}
             </div>
           </div>
         )}
 
-        {/* grid: 1..5 columns responsive; use group to allow hover effects that shrink other tiles */}
-        <div className="group grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 p-2">
+        {/* Responsive grid: 1→2→3→4→5 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 sm:gap-1.5 md:gap-2">
           {items.map((it) => (
             <CameraTile
               key={it.cam.id}
@@ -476,11 +472,12 @@ const App: React.FC = () => {
 
       {selectedItem && (
         <Modal isOpen={true} onClose={closeModal}>
-          <div className="w-full max-w-[1200px] max-h-[90vh] overflow-auto rounded-md bg-neutral-900 p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex-1">
+          <div className="w-full max-w-[1200px] max-h-[90vh] overflow-auto bg-white p-3 sm:p-4 md:p-5">
+            {/* Stack vertically on mobile, side-by-side on md+ */}
+            <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-4">
+              <div className="flex-1 min-w-0">
                 {selectedItem.imageUrl ? (
-                  <div className="w-full aspect-[16/10] bg-neutral-950 rounded overflow-hidden">
+                  <div className="w-full aspect-[16/10] bg-finn-bg rounded-sm overflow-hidden">
                     <img
                       src={`${selectedItem.imageUrl}${
                         selectedItem.imageUrl.includes("?") ? "&" : "?"
@@ -490,22 +487,23 @@ const App: React.FC = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-[60vh] flex items-center justify-center bg-neutral-800 text-neutral-400 rounded">
+                  <div className="w-full h-[40vh] md:h-[60vh] flex items-center justify-center bg-finn-bg text-finn-muted rounded-sm">
                     {t("camera.noImage")}
                   </div>
                 )}
               </div>
-              <div className="w-64 flex-none text-sm">
-                <div className="font-semibold text-lg mb-2">
+              {/* Metadata: inline row on mobile, sidebar on md+ */}
+              <div className="md:w-48 lg:w-56 md:flex-none text-sm text-finn-text">
+                <div className="font-semibold text-sm sm:text-base mb-0.5">
                   {selectedItem.cam.properties?.name}
                 </div>
                 {selectedItem.cam.properties?.municipality && (
-                  <div className="opacity-80 mb-2">
+                  <div className="text-finn-muted text-xs sm:text-sm mb-1">
                     {selectedItem.cam.properties.municipality}
                   </div>
                 )}
                 {selectedItem.latestModified && (
-                  <div className="opacity-70 text-xs">
+                  <div className="text-finn-muted text-xs">
                     {t("modal.lastUpdated", {
                       time: new Date(
                         selectedItem.latestModified,
@@ -538,29 +536,30 @@ const App: React.FC = () => {
           setSettingsOpen(false);
         }}
       >
-        <div className="w-full max-w-[900px] rounded-md bg-neutral-900 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-lg font-semibold">{t("settings.title")}</div>
-              <div className="text-sm opacity-80 mt-1">
-                {t("settings.intro")}
-              </div>
+        <div className="w-full max-w-[900px] bg-white p-4 sm:p-5 md:p-6">
+          <div className="mb-4">
+            <div className="text-base sm:text-lg font-semibold text-finn-text">
+              {t("settings.title")}
+            </div>
+            <div className="text-xs sm:text-sm text-finn-muted mt-1">
+              {t("settings.intro")}
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mb-4">
             <CitySelector
               selectedCities={selectedCities}
               onChange={(c) => setSelectedCities(c)}
             />
           </div>
 
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <label className="inline-flex items-center gap-2 text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-finn-border">
+            <label className="inline-flex items-center gap-2 text-xs sm:text-sm text-finn-text cursor-pointer">
               <input
                 type="checkbox"
                 checked={showLabels}
                 onChange={(e) => setShowLabels(e.target.checked)}
+                className="accent-finn-blue w-4 h-4"
               />
               <span>{t("app.showLabels")}</span>
             </label>
@@ -569,7 +568,7 @@ const App: React.FC = () => {
               {!isOnboarding && (
                 <button
                   type="button"
-                  className="px-3 py-2 rounded bg-white/5 hover:bg-white/10 text-sm"
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-sm text-finn-muted border border-finn-border hover:border-finn-sky hover:text-finn-sky transition-colors"
                   onClick={() => setSettingsOpen(false)}
                 >
                   {t("modal.close")}
@@ -577,7 +576,7 @@ const App: React.FC = () => {
               )}
               <button
                 type="button"
-                className="px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 text-sm disabled:opacity-50"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-sm font-medium bg-finn-blue text-white hover:bg-finn-hover transition-colors disabled:opacity-50"
                 disabled={selectedCities.length === 0}
                 onClick={saveMyCities}
               >

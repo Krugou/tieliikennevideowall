@@ -310,13 +310,13 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-full max-w-[900px] bg-white p-6 font-mono text-black">
-        <div className="mb-4 flex items-start justify-between gap-4 border-b-4 border-black pb-4">
+      <div className="w-full max-w-[900px] bg-white p-3 sm:p-4 md:p-6 font-sans text-finn-text">
+        <div className="mb-3 sm:mb-4 flex items-start justify-between gap-2 sm:gap-4 border-b border-finn-border pb-3">
           <div className="flex-1">
-            <h2 className="text-2xl font-sans font-black uppercase tracking-tighter bg-neo-yellow inline-block px-2 border-2 border-black">
+            <h2 className="text-base sm:text-lg md:text-xl font-semibold text-finn-blue">
               {t("map.title")}
             </h2>
-            <p className="text-sm font-bold mt-2">
+            <p className="text-xs sm:text-sm text-finn-muted mt-0.5">
               {selectedTarget && routeCameras.length > 0
                 ? t("map.routeCameraCount", {
                     count: routeCameras.length,
@@ -329,7 +329,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
             type="button"
             onClick={onClose}
             aria-label={t("modal.close")}
-            className="flex-none px-4 py-2 text-sm font-bold border-2 border-black shadow-neo-sm hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all bg-white hover:bg-neutral-100 uppercase"
+            className="flex-none px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-finn-muted border border-finn-border rounded hover:border-finn-sky hover:text-finn-sky transition-colors"
           >
             {t("modal.close")}
           </button>
@@ -337,23 +337,23 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
         {/* Route controls */}
         {userLocation && (
-          <div className="mb-4 p-4 border-4 border-black bg-neo-offwhite shadow-neo-sm">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="mb-3 p-2.5 sm:p-4 rounded border border-finn-border bg-finn-bg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
               <div className="flex-1">
                 {!selectedTarget ? (
-                  <p className="text-sm font-bold">
+                  <p className="text-xs sm:text-sm font-semibold">
                     {t("map.clickCameraForRoute")}
                   </p>
                 ) : (
                   <div>
-                    <p className="text-sm">
+                    <p className="text-xs sm:text-sm">
                       {t("map.routeToTarget")}:{" "}
-                      <strong className="bg-neo-green px-1 border-2 border-black">
+                      <strong className="text-finn-blue font-semibold">
                         {selectedTarget.name}
                       </strong>
                     </p>
                     {isCalculatingRoute && (
-                      <p className="text-xs font-bold animate-pulse mt-1 text-neo-blue">
+                      <p className="text-xs text-finn-muted mt-1">
                         {t("map.calculatingRoute")}
                       </p>
                     )}
@@ -363,7 +363,7 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
               {selectedTarget && (
                 <button
                   onClick={handleClearRoute}
-                  className="px-3 py-1 text-xs font-bold bg-neo-red text-white border-2 border-black shadow-neo-sm hover:shadow-neo uppercase"
+                  className="px-3 py-1.5 text-xs font-medium bg-finn-red text-white rounded hover:opacity-90 transition-opacity"
                 >
                   {t("map.clearRoute")}
                 </button>
@@ -373,8 +373,8 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
         )}
 
         {!userLocation && (
-          <div className="mb-4 p-3 bg-neo-blue text-white border-4 border-black shadow-neo-sm">
-            <p className="text-sm font-bold">
+          <div className="mb-3 p-2 sm:p-3 bg-finn-blue/10 text-finn-blue border border-finn-blue/30 rounded">
+            <p className="text-xs sm:text-sm font-semibold">
               {t("map.enableLocationForRoute")}
             </p>
           </div>
@@ -382,23 +382,23 @@ const MapModal: React.FC<Props> = ({ isOpen, onClose, cameras }) => {
 
         <div
           ref={mapContainerRef}
-          className="w-full h-[60vh] min-h-[400px] border-4 border-black shadow-neo"
+          className="w-full h-[40vh] sm:h-[50vh] md:h-[60vh] min-h-[250px] border border-finn-border rounded shadow-sm"
         />
 
         {/* Camera list */}
-        <div className="mt-4 max-h-48 overflow-y-auto border-2 border-black p-2 bg-neo-offwhite">
-          <details className="text-sm">
-            <summary className="cursor-pointer font-bold hover:text-neo-blue">
+        <div className="mt-3 max-h-36 sm:max-h-48 overflow-y-auto border border-finn-border rounded p-1.5 sm:p-2 bg-finn-bg">
+          <details className="text-xs sm:text-sm">
+            <summary className="cursor-pointer font-medium text-finn-text hover:text-finn-blue">
               {t("map.showList", { count: displayedCameras.length })}
             </summary>
             <ul className="mt-2 space-y-1">
               {displayedCameras.map((camera) => (
                 <li
                   key={camera.id}
-                  className={`text-xs p-1 border-b border-black/10 flex justify-between ${
+                  className={`text-xs px-2 py-1 rounded flex justify-between ${
                     selectedTarget?.id === camera.id
-                      ? "bg-neo-green text-black font-bold border-2 border-black"
-                      : "text-neutral-600"
+                      ? "bg-finn-blue text-white font-semibold"
+                      : "text-finn-muted"
                   }`}
                 >
                   <span>
